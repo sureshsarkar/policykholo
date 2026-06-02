@@ -12,6 +12,7 @@
                 <div class="modal-body">
                     <div class="quote-card-u sr">
                         <div class="p-2">
+                        <div class="form-row-2">
                             <!-- Select Policy -->
                             <div class="form-group">
                                 <div class="form-label-pl">
@@ -35,6 +36,7 @@
                                         required>
                                     <i class="fas fa-user input-icon"></i>
                                 </div>
+                            </div>
                             </div>
 
                             <!-- MObile + Email -->
@@ -102,7 +104,9 @@
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-4">
-                <div class="foot-logo">Kharido<span>Policy</span></div>
+                <div class="foot-logo">
+                <img src="{{ asset($setting_data['footer_logo'] ?? 'front/images/logo.png') }}" alt="Logo">
+                </div>
                 <p class="foot-desc">{{ $setting_data['about'] }}</p>
                 <div class="foot-social">
                     @if(!empty($setting_data['facebook']))
@@ -151,8 +155,8 @@
                 <div class="foot-col-h">Legal</div>
                 <ul class="foot-links">
                     <li><a href="{{ url('privacy-policy') }}">Privacy Policy</a></li>
-                    <li><a href="{{ url('terms-of-use') }}">Terms of Use</a></li>
-                    <li><a href="{{ url('disclosure') }}">Disclosure</a></li>
+                    <li><a href="{{ url('terms-and-conditions') }}">Terms & Conditions</a></li>
+                    <li><a href="{{ url('disclaimer') }}">Disclaimer</a></li>
                 </ul>
             </div>
         </div>

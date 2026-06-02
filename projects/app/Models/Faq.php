@@ -16,9 +16,7 @@ class Faq extends Model
 		'id',
 		"question",
         "answer",
-        'type',
-
-
+        'type', 
         "question_ger",
         "answer_ger",
 
@@ -27,5 +25,9 @@ class Faq extends Model
     public static $rules = [
        
     ];
+
+    public function policy(){
+         return $this->belongsTo(Service::class, 'type');
+    }
 
 }

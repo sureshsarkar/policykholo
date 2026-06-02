@@ -2,86 +2,212 @@
 <!-- ═══ HERO ═══ -->
 <section class="hero" id="hero">
   <div class="container" style="position:relative;z-index:1">
-    <div class="row align-items-center">
+    <div class="row align-items-center-">
 
-      <div class="col-lg-6 mb-5 mb-lg-0">
-        <div class="hero-tag">
-          <div class="hero-tag-badge">NEW</div>
-          Rated #1 Insurance Platform 2024
-        </div>
+      <!-- ── LEFT ── -->
+      <div class="col-lg-6">
+        <div class="hero-tag">Zimmedari Ka Pehla Kadam </div>
         <h1 class="hero-h">
           Secure Your Family's<br>
           <span class="ital">Financial Future</span><br>
-          — Starting Today
+          Starting Today
         </h1>
         <p class="hero-sub">
-          Compare <strong>50+ insurance plans</strong> from India's top insurers in minutes. Comprehensive life coverage starting at just <strong>₹21/day</strong> — no hidden charges.
+        Compare <strong>25+ insurance plans</strong> from India's top <strong>IRDAI-registered</strong> insurers, in minutes. No spam calls. <strong>No hidden charges.</strong> No pressure. Just the right policy for you.
+
+          {{-- Compare <strong>50+ insurance plans</strong> from India's top insurers in minutes.
+          Comprehensive life coverage starting at just <strong>₹21/day</strong> — no hidden charges. --}}
         </p>
         <div class="hero-actions">
-          <a href="#categories" class="btn-pl lg"><i class="fas fa-chart-bar"></i> Compare Plans</a>
-          <a href="#" class="btn-white-outline" data-bs-toggle="modal" data-bs-target="#getQuoteModel">Get Free Quote <i class="fas fa-arrow-right fa-xs"></i></a>
+          <a href="#categories" class="btn-pl lg">
+            <i class="fas fa-chart-bar"></i> Compare Plans
+          </a>
+          <a href="#" class="btn-white-outline"  data-bs-toggle="modal" data-bs-target="#getQuoteModel">
+            Get Free Quote <i class="fas fa-arrow-right fa-xs"></i>
+          </a>
         </div>
-        <div class="hero-trust">
+        {{-- <div class="hero-trust">
           <div class="hti">
             <div class="hti-icon"><i class="fas fa-users"></i></div>
-            <div><div class="hti-num">{{$setting_data['project completed']}}</div><div class="hti-label">Customers</div></div>
+            <div>
+              <div class="hti-num">{{$setting_data['project completed']}}+</div>
+              <div class="hti-label">Customers</div>
+            </div>
           </div>
           <div class="hti">
             <div class="hti-icon"><i class="fas fa-building"></i></div>
-            <div><div class="hti-num">{{ $setting_data['Working hours'] }}+</div><div class="hti-label">Insurance Companies</div></div>
+            <div>
+              <div class="hti-num">{{ $setting_data['Working hours'] }}+</div>
+              <div class="hti-label">Companies</div>
+            </div>
           </div>
           <div class="hti">
             <div class="hti-icon"><i class="fas fa-circle-check"></i></div>
-            <div><div class="hti-num">{{$setting_data['Experienced Staff']}}%</div><div class="hti-label">Claims Settled</div></div>
+            <div>
+              <div class="hti-num">{{$setting_data['Experienced Staff']}}%</div>
+              <div class="hti-label">Claims Settled</div>
+            </div>
           </div>
-        </div>
+        </div> --}}
       </div>
 
-      <div class="col-lg-5 offset-lg-1">
+      <!-- ── RIGHT ── -->
+      {{-- <div class="col-lg-5 offset-lg-1"> --}}
+      <div class="col-lg-6">
         <div class="hero-visual">
+
+          <!-- Floating chip — Claim Settled -->
+          {{-- <div class="fc fc1">
+            <div class="fc-inner">
+              <div class="fc-icon g"><i class="fas fa-circle-check"></i></div>
+              <div>
+                <div class="fc-lbl">Claim Settled</div>
+                <div class="fc-val">₹25L in 24 hrs</div>
+              </div>
+            </div>
+          </div> --}}
+
+          <!-- Main card -->
           <div class="hero-card-main">
+
+            <!-- Header -->
             <div class="hcm-head">
-              <div class="hcm-title">Your Coverage Overview</div>
-              <div class="hcm-badge">Active</div>
+              <div class="hcm-title">Coverage Overview</div>
+              <div class="hcm-badge">
+                <div class="hcm-badge-dot"></div>
+                <span class="hcm-badge-text">Active</span>
+              </div>
             </div>
-            <div class="bar-wrap">
-              <div class="bar-label"><span>Life Cover</span><strong>₹1 Crore</strong></div>
-              <div class="bar-bg"><div class="bar-fill f1"></div></div>
+
+            <!-- Donut chart + stat bars -->
+            <div class="hcm-donut-row">
+
+              <!-- SVG Donut -->
+              <div class="hcm-donut">
+                <svg width="118" height="118" viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Outer track -->
+                  <circle cx="59" cy="59" r="47" fill="none" stroke="#f1f5f9" stroke-width="10"/>
+                  <!-- Outer arc — Claim Settlement 98.2% -->
+                  <circle cx="59" cy="59" r="47"
+                    fill="none" stroke="#2dd4bf" stroke-width="10"
+                    stroke-linecap="round"
+                    stroke-dasharray="295.3"
+                    stroke-dashoffset="5.3"
+                    transform="rotate(-90 59 59)"
+                    style="animation:donutFill1 1.6s cubic-bezier(.4,0,.2,1) .5s both">
+                  </circle>
+                  <!-- Inner track -->
+                  <circle cx="59" cy="59" r="34" fill="none" stroke="#eff6ff" stroke-width="8"/>
+                  <!-- Inner arc — Life Cover 78% -->
+                  <circle cx="59" cy="59" r="34"
+                    fill="none" stroke="#3b82f6" stroke-width="8"
+                    stroke-linecap="round"
+                    stroke-dasharray="213.6"
+                    stroke-dashoffset="47"
+                    transform="rotate(-90 59 59)"
+                    style="animation:donutFill2 1.5s cubic-bezier(.4,0,.2,1) .7s both">
+                  </circle>
+                  <!-- Center label -->
+                  <text x="59" y="53" text-anchor="middle"
+                    font-family="'DM Sans',sans-serif"
+                    font-size="17" font-weight="800" fill="#071525">98.1%</text>
+                  <text x="59" y="68" text-anchor="middle"
+                    font-family="'DM Sans',sans-serif"
+                    font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.06em">SETTLEMENT</text>
+                </svg>
+              </div>
+
+              <!-- Stat bars -->
+              <div class="hcm-bars">
+                <div class="hb-item">
+                  <div class="hb-row">
+                    <span class="hb-label">Life Cover</span>
+                    <span class="hb-value">₹50 Lakh – ₹1 Crore</span>
+                  </div>
+                  <div class="hb-track">
+                    <div class="hb-fill c1" style="width:65%"></div>
+                  </div>
+                </div>
+                <div class="hb-item">
+                  <div class="hb-row">
+                    <span class="hb-label">Health Cover</span>
+                    <span class="hb-value">₹5 – ₹10 Lakh</span>
+                  </div>
+                  <div class="hb-track">
+                    <div class="hb-fill c2" style="width:70%"></div>
+                  </div>
+                </div>
+                <div class="hb-item">
+                  <div class="hb-row">
+                    <span class="hb-label">Starting Term Plan</span>
+                    <span class="hb-value">₹18/day</span>
+                  </div>
+                  <div class="hb-track">
+                    <div class="hb-fill c3" style="width:50%"></div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="bar-wrap">
-              <div class="bar-label"><span>Health Cover</span><strong>₹10 Lakh</strong></div>
-              <div class="bar-bg"><div class="bar-fill f2"></div></div>
-            </div>
-            <div class="bar-wrap" style="margin-bottom:0">
-              <div class="bar-label"><span>Claim Settlement</span><strong>98.2%</strong></div>
-              <div class="bar-bg"><div class="bar-fill f3"></div></div>
-            </div>
+
+            <div class="hcm-divider"></div>
+
+            <!-- Insurer grid -->
             <div class="hcm-grid">
-              <div class="hcm-plan"><div class="hcm-plan-name">HDFC Life</div><div class="hcm-plan-amt">CSR <strong>99.5%</strong></div></div>
-              <div class="hcm-plan"><div class="hcm-plan-name">Max Life</div><div class="hcm-plan-amt">CSR <strong>99.3%</strong></div></div>
-              <div class="hcm-plan"><div class="hcm-plan-name">ICICI Pru</div><div class="hcm-plan-amt">CSR <strong>98.6%</strong></div></div>
-              <div class="hcm-plan"><div class="hcm-plan-name">Term Plan</div><div class="hcm-plan-amt">from <strong>₹525/mo</strong></div></div>
+              <div class="hcm-insurer">
+                <div class="hcm-ins-top">
+                  <span class="hcm-ins-name">Families Covered</span>
+                  {{-- <div class="hcm-ins-logo" style="background:#fff1e6;color:#c2410c">HD</div> --}}
+                </div>
+                <div class="hcm-ins-csr"><strong>2,500+</strong></div>
+              </div>
+              <div class="hcm-insurer">
+                <div class="hcm-ins-top">
+                  <span class="hcm-ins-name">Insurance Partners</span>
+                  {{-- <div class="hcm-ins-logo" style="background:#ede9fe;color:#6d28d9">ML</div> --}}
+                </div>
+                <div class="hcm-ins-csr"><strong>12+</strong></div>
+              </div>
+              <div class="hcm-insurer">
+                <div class="hcm-ins-top">
+                  <span class="hcm-ins-name">Claims Assisted</span>
+                  {{-- <div class="hcm-ins-logo" style="background:#ecfdf5;color:#065f46">IP</div> --}}
+                </div>
+                <div class="hcm-ins-csr"><strong>1,000+</strong></div>
+              </div>
+              <div class="hcm-insurer">
+                <div class="hcm-ins-top">
+                  <span class="hcm-ins-name">Policy Renewal Rate</span>
+                  {{-- <div class="hcm-ins-logo" style="background:#dbeafe;color:#1e40af">LI</div> --}}
+                </div>
+                <div class="hcm-ins-csr"><strong>90%</strong></div>
+              </div>
             </div>
-          </div>
-          <div class="fc fc1">
-            <div class="fc-row">
-              <div class="fc-icon fci-g"><i class="fas fa-circle-check"></i></div>
-              <div><div class="fc-lbl">Claim Settled</div><div class="fc-val">₹25L in 24 hrs</div></div>
+
+          </div><!-- /hero-card-main -->
+
+          <!-- Floating chip — Instant Issuance -->
+          {{-- <div class="fc fc2">
+            <div class="fc-inner">
+              <div class="fc-icon b"><i class="fas fa-bolt"></i></div>
+              <div>
+                <div class="fc-lbl">Instant Issuance</div>
+                <div class="fc-val">Policy in 2 min</div>
+              </div>
             </div>
-          </div>
-          <div class="fc fc2">
-            <div class="fc-row">
-              <div class="fc-icon fci-b"><i class="fas fa-bolt"></i></div>
-              <div><div class="fc-lbl">Instant Issuance</div><div class="fc-val">Policy in 2 min</div></div>
+          </div> --}}
+
+          <!-- Floating chip — Customer Rating -->
+          {{-- <div class="fc fc3">
+            <div class="fc-inner">
+              <div class="fc-icon a"><i class="fas fa-star"></i></div>
+              <div>
+                <div class="fc-lbl">Customer Rating</div>
+                <div class="fc-val">4.9 / 5.0</div>
+              </div>
             </div>
-          </div>
-          <div class="fc fc3">
-            <div class="fc-row">
-              <div class="fc-icon fci-a"><i class="fas fa-star"></i></div>
-              <div><div class="fc-lbl">Customer Rating</div><div class="fc-val">4.9 / 5.0</div></div>
-            </div>
-          </div>
-        </div>
+          </div> --}}
+
+        </div><!-- /hero-visual -->
       </div>
 
     </div>

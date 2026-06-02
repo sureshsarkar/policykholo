@@ -38,6 +38,7 @@ use App\Models\Domainfeedback;
 use App\Models\ServiceData;
 use App\Models\CmsData;
 use App\Models\Weoffer;
+use App\Models\Faq;
 
 use Image;
 use Validator;
@@ -337,13 +338,15 @@ class PageController extends Controller
 
 
         $data = Cms::where("seo_url", 'home')->first();
-        $BreakingNews = NewsPost::where('breaking_news', 'yes')->where('publish', 'published')->orderBy('id', 'desc')->limit(10)->select('id', 'name', 'seo_url', 'bannerImage')->get();
+        $policydata = Service::with(['faqs'])->where('publish', 'published')->whereHas('faqs')->get(['name','id']);
+
+        // $BreakingNews = NewsPost::where('breaking_news', 'yes')->where('publish', 'published')->orderBy('id', 'desc')->limit(10)->select('id', 'name', 'seo_url', 'bannerImage')->get();
         // return $TrendingNews = NewsPost::where('trending_news','yes')->where('publish','published')->orderBy('id', 'desc')->limit(10)->select('id', 'name', 'seo_url','bannerImage')->get();
 
         if ($data) {
             if ($data->templete == "home") {
                 $templete = "front.static." . $data->templete;
-                return view($templete, compact("data", "BreakingNews"));
+                return view($templete, compact("data", "policydata"));
             }
         }
         return abort(404);

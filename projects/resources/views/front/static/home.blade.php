@@ -40,7 +40,7 @@
                     @endforeach
                 </div>
             </div>
-        </section> 
+        </section>
     @endif
 
     <div class="divider"></div>
@@ -120,55 +120,7 @@
             </div>
         </section>
     @endif
-    <style>
-        .slider {
-            /* background: white; */
-            /* box-shadow: 0 10px 20px -5px rgba(0, 0, 0, .125); */
-            height: 100px;
-            margin: auto;
-            overflow: hidden;
-            position: relative;
-            width: 1150px;
-        }
 
-        .slider::before,
-        .slider::after {
-            /* background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%); */
-            content: "";
-            height: 100px;
-            position: absolute;
-            width: 200px;
-            z-index: 2;
-        }
-
-        .slide-track {
-            animation: scroll 40s linear infinite;
-            display: flex;
-            width: calc(250px * 14);
-        }
-
-
-        .client {
-            height: 100px;
-            width: 250px;
-        }
-
-        .client img {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-        }
-
-        @keyframes scroll {
-            0% {
-                transform: translateX(0);
-            }
-
-            100% {
-                transform: translateX(calc(-250px * 7));
-            }
-        }
-    </style>
 
 
     <!-- ═══ STATS ═══ -->
@@ -217,7 +169,7 @@
 
                 <div class="partners-section sr">
                     <div class="partners-lbl">Our Insurance Partners</div>
-                    <div class="slider">
+                    <div class="slider--">
                         <div class="slide-track">
                             @foreach ($ourPartners as $p)
                                 <div class="client">
@@ -355,40 +307,61 @@
             </div>
         </section>
     @endif
+
+
+
     <!-- ═══════════════════════════════════════
                      SECTION 6 – FAQ
                 ═══════════════════════════════════════ -->
 
-    @php
-        $faqs = App\Models\Faq::where('publish', 'published')->limit(10)->get();
-    @endphp
-    <section class="faq-section">
-        <div class="container">
-            <div class="row align-items-center mb-5 sr">
-                <div class="col-lg-12">
-                    <h2 class="section-h mb-3 text-center">Frequently Asked <em>Questions</em></h2>
-                </div>
-            </div>
+                <section class="faq-section">
+  <div class="container">
 
-            @if ($faqs->count() > 0)
-                <div class="row">
-                    <div class="col-lg-12 mx-auto sr">
-                        @foreach ($faqs as $k => $f)
-                            <div class="faq-item {{ $k == 0 ? 'open' : '' }}">
-                                <div class="faq-q" onclick="toggleFaq(this)">
-                                    <span class="faq-q-text">{{ $f->question }}</span>
-                                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
-                                </div>
-                                <div class="faq-a">
-                                    {{ $f->answer }}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+    {{-- Title --}}
+    <div class="row mb-4 sr">
+      <div class="col-12 text-center">
+        <h2 class="section-h">Frequently Asked <em>Questions</em></h2>
+      </div>
+    </div>
+
+    @if($policydata->count() > 0)
+
+    {{-- Tab Buttons --}}
+    <div class="faq-tab-wrapper">
+      <div class="faq-tab-bar" id="faqTabBar">
+        @foreach($policydata as $i => $p)
+          <button
+            class="faq-tab-btn {{ $i === 0 ? 'active' : '' }}"
+            onclick="switchFaqTab(this, 'faq-panel-{{ $i }}')"
+          >
+            {{ $p->name }}
+          </button>
+        @endforeach
+      </div>
+    </div>
+
+    {{-- FAQ Panels --}}
+    <div class="faq-panels-wrap">
+      @foreach($policydata as $i => $p)
+        <div class="faq-panel {{ $i === 0 ? 'active' : '' }}" id="faq-panel-{{ $i }}">
+          @foreach($p->faqs as $k => $f)
+            <div class="faq-item {{ ($k === 0) ? 'open' : '' }}">
+              <div class="faq-q" onclick="toggleFaq(this)">
+                <span class="faq-q-text">{{ $f->question }}</span>
+                <div class="faq-icon"><i class="fas fa-plus"></i></div>
+              </div>
+              <div class="faq-a">{!! $f->answer !!}</div>
+            </div>
+          @endforeach
         </div>
-    </section>
+      @endforeach
+    </div>
+
+    @endif
+  </div>
+</section>
+
+
 
 
     <!-- ═══ CTA BANNER ═══ -->
@@ -397,8 +370,8 @@
             <div class="sr">
                 {!!$data->longDescriptionthree!!}
                 <div class="cta-acts">
-                    <a href="#categories" class="btn-cta-main"><i class="fas fa-shield-halved"
-                            style="color:var(--blue)"></i> Get Best Insurance Plan</a>
+                    <a href="{{ $setting_data['whatsapp_url'] }}" target="_blank" class="btn-cta-main"><i class="fa-brands fa-whatsapp"
+                            style="color:var(--green)"></i> WhatsApp Us</a>
                     <a href="tel:{{ $setting_data['mobile'] }}" class="btn-white-outline">Talk to an Advisor <i
                             class="fas fa-headset fa-sm"></i></a>
                 </div>
@@ -411,12 +384,32 @@
 
     <script>
         /* FAQ toggle */
-        function toggleFaq(el) {
+        function switchFaqTab(btn, panelId) {
+            // tabs
+            document.querySelectorAll('.faq-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // panels
+            document.querySelectorAll('.faq-panel').forEach(p => p.classList.remove('active'));
+            const panel = document.getElementById(panelId);
+            panel.classList.add('active');
+            }
+
+            function toggleFaq(el) {
             const item = el.closest('.faq-item');
             const isOpen = item.classList.contains('open');
-            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+            // sibling items close
+            item.closest('.faq-panel')
+                .querySelectorAll('.faq-item')
+                .forEach(i => i.classList.remove('open'));
             if (!isOpen) item.classList.add('open');
-        }
+            }
+
+        // function toggleFaq(el) {
+        //     const item = el.closest('.faq-item');
+        //     const isOpen = item.classList.contains('open');
+        //     document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        //     if (!isOpen) item.classList.add('open');
+        // }
 
         // owlCarousel start
         document.addEventListener("DOMContentLoaded", function() {

@@ -47,6 +47,7 @@
                         
             
                         <th>Question</th>
+                        <th>Policy Name</th>
                         <th>Status</th>
                         
                         <th>Action</th>
@@ -62,6 +63,9 @@
                         
                             <td>
                                 {{ $client->question }}
+                            </td>
+                            <td>
+                                {{ $client->policy->name??'' }}
                             </td>
                            
                                  <td>

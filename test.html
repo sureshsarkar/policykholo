@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Key Benefits – Health Insurance</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary: #1040c4;
+      --primary-light: #1a55e8;
+      --primary-pale: #eef3ff;
+      --teal: #00b8a9;
+      --orange: #f59c1a;
+      --green: #27ae60;
+      --purple: #7c3aed;
+      --red: #e84545;
+      --yellow: #f5c518;
+      --text-dark: #0d1b4b;
+      --text-mid: #3d4f7c;
+      --text-muted: #7a8bae;
+      --white: #fff;
+      --bg: #f4f7fd;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      padding: 64px 16px 80px;
+    }
+
+     
+ 
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 500;
+      max-width: 580px;
+      line-height: 1.75;
+      margin-bottom: 0;
+    }
+
+
+
+    /* ─── CARDS GRID ─── */
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    /* Wide card spans 2 cols */
+    .benefit-card.wide {
+      grid-column: span 2;
+    }
+
+    .benefit-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 28px 26px;
+      border: 2px solid #e5ecf8;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .28s cubic-bezier(.34, 1.56, .64, 1),
+        box-shadow .28s, border-color .28s;
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 48px rgba(16, 64, 196, .14);
+      border-color: var(--card-color, var(--primary));
+    }
+
+    /* Top accent line */
+    .benefit-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--card-color, var(--primary));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s ease;
+    }
+
+    .benefit-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    /* Faint large icon watermark */
+    .benefit-card::after {
+      content: attr(data-emoji);
+      position: absolute;
+      bottom: -10px;
+      right: 10px;
+      font-size: 72px;
+      opacity: .06;
+      pointer-events: none;
+      line-height: 1;
+      transition: opacity .3s, transform .3s;
+    }
+
+    .benefit-card:hover::after {
+      opacity: .10;
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    /* Icon circle */
+    .b-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 18px;
+      background: var(--icon-bg, var(--primary-pale));
+      transition: transform .3s;
+    }
+
+    .benefit-card:hover .b-icon {
+      transform: scale(1.1) rotate(-4deg);
+    }
+
+    .b-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .b-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.65;
+    }
+
+    /* Highlight chip inside card */
+    .b-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--chip-bg, var(--primary-pale));
+      color: var(--chip-txt, var(--primary));
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-top: 14px;
+    }
+
+    /* Wide card: horizontal layout */
+    .benefit-card.wide .b-inner {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .benefit-card.wide .b-icon {
+      min-width: 56px;
+    }
+
+    .benefit-card.wide .b-text {
+      flex: 1;
+    }
+
+
+    /* ─── ANIMATIONS ─── */
+    .benefit-card {
+      animation: fadeUp .5s both;
+    }
+
+    .benefit-card:nth-child(1) {
+      animation-delay: .05s;
+    }
+
+    .benefit-card:nth-child(2) {
+      animation-delay: .10s;
+    }
+
+    .benefit-card:nth-child(3) {
+      animation-delay: .15s;
+    }
+
+    .benefit-card:nth-child(4) {
+      animation-delay: .20s;
+    }
+
+    .benefit-card:nth-child(5) {
+      animation-delay: .25s;
+    }
+
+    .benefit-card:nth-child(6) {
+      animation-delay: .30s;
+    }
+
+    .benefit-card:nth-child(7) {
+      animation-delay: .35s;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(26px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .benefit-card.wide {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .benefits-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .benefit-card.wide {
+        grid-column: span 1;
+      }
+
+      .benefit-card.wide .b-inner {
+        flex-direction: column;
+      }
+
+      .stat-cell {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, .12);
+      }
+
+      .stat-cell:last-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div style="max-width:1100px; margin:0 auto;">
+
+    <!-- Header -->
+    <div class="eyebrow"><i class="fas fa-heart-pulse"></i> Why Choose Health Insurance</div>
+    <h2 class="section-title">Key Benefits of <span>Health Insurance</span></h2>
+    <p class="section-sub">
+      A good health insurance plan does far more than pay hospital bills.
+      Here's everything you're protected against — from day one.
+    </p>
+
+
+    <!-- Benefits Grid -->
+    <div class="benefits-grid"> 
+      <!-- 2: Daycare Procedures -->
+      <div class="benefit-card" data-emoji="💉" style="--card-color:#00b8a9; --icon-bg:#e6faf8;">
+        <div class="b-icon">💉</div>
+        <div class="b-title">500+ Daycare Procedures</div>
+        <div class="b-desc">
+          Modern treatments like cataract, dialysis, and chemotherapy that need less than 24 hrs are fully covered.
+        </div>
+        <span class="b-chip" style="--chip-bg:#e6faf8; --chip-txt:#007a6e;">
+          <i class="fas fa-check" style="font-size:10px;"></i> No 24-hr Admission Needed
+        </span>
+      </div>
+
+      <!-- 3: Pre & Post Hospitalisation -->
+      <div class="benefit-card" data-emoji="📋" style="--card-color:#7c3aed; --icon-bg:#f3eeff;">
+        <div class="b-icon">📋</div>
+        <div class="b-title">Pre & Post Hospitalisation</div>
+        <div class="b-desc">
+          Expenses 30 days before and 60 days after discharge — doctor visits, tests, medicines — all covered.
+        </div>
+        <span class="b-chip" style="--chip-bg:#f3eeff; --chip-txt:#7c3aed;">
+          <i class="fas fa-calendar-check" style="font-size:10px;"></i> 30 + 60 Day Cover
+        </span>
+      </div>
+
+
+
+      <!-- 5: Free Health Checkup -->
+      <div class="benefit-card" data-emoji="🩺" style="--card-color:#f59c1a; --icon-bg:#fff7e6;">
+        <div class="b-icon">🩺</div>
+        <div class="b-title">Free Annual Health Check-up</div>
+        <div class="b-desc">
+          Preventive care matters. Get a free comprehensive health check every year — at no extra cost to you.
+        </div>
+        <span class="b-chip" style="--chip-bg:#fff7e6; --chip-txt:#c47a00;">
+          <i class="fas fa-gift" style="font-size:10px;"></i> Complimentary Every Year
+        </span>
+      </div>
+
+
+
+      <!-- 7: Tax Savings -->
+      <div class="benefit-card" data-emoji="💰" style="--card-color:#e84545; --icon-bg:#fef0f0;">
+        <div class="b-icon">💰</div>
+        <div class="b-title">Tax Savings Under Sec 80D</div>
+        <div class="b-desc">
+          Save up to ₹75,000 in taxes annually on your health insurance premiums. Smart coverage that also saves money.
+        </div>
+        <span class="b-chip" style="--chip-bg:#fef0f0; --chip-txt:#c0392b;">
+          <i class="fas fa-indian-rupee-sign" style="font-size:10px;"></i> Up to ₹75,000 Saved
+        </span>
+      </div>
+
+    </div>
+    
+    <!-- /benefits-grid -->
+
+
+  </div>
+</body>
+
+</html>

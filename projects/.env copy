@@ -1,9 +1,9 @@
-APP_NAME='Demo project'
+APP_NAME='Policy Kholo'
 APP_ENV=local
 APP_KEY=base64:JPIi7Z2nfmnQwzJy64dHgQ0TQscWKzk2/qRcRDn6YtI=
-APP_DEBUG=true
-APP_URL='http://localhost/laravel/policy-bazar/'
-# APP_URL='https://majlixx.demo1.projectdigitalhubsolution.com/'
+APP_DEBUG=false
+# APP_URL='http://localhost/laravel/policy-bazar/'
+APP_URL='https://policykholo.com/'
 APP_URL_WITHOUT_HTTPS=DEMO
 
 
@@ -12,11 +12,14 @@ LOG_DEPRECATIONS_CHANNEL=null
 LOG_LEVEL=debug
 
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=localhost
 DB_PORT=3306
-DB_DATABASE=policy_bazaar
-DB_USERNAME=root
-DB_PASSWORD=
+DB_DATABASE=policykh1_policykholo_db
+DB_USERNAME=policykh1_policy_user
+DB_PASSWORD='ig*2#TAfoOhUb67q'
+
+
+
 
 # For Server
 # DB_HOST=127.0.0.1

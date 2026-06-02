@@ -25,6 +25,7 @@ use App\Models\Property;
 use App\Models\PropertyRate;
 use App\Models\CareerCategory;
 use App\Models\Country;
+use App\Models\Service;
 
 use App\Models\Cms;
 
@@ -174,6 +175,17 @@ class ModelHelper{
     }
 
 
+
+
+    function getPolicySelectList(){
+
+        $data=[];
+        $all=Service::all();
+        foreach($all as $a){
+            $data[$a->id]=$a->name;
+        }
+        return $data;
+    }
 
 
     function getPageSelectList(){

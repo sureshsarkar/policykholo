@@ -58,5 +58,9 @@ class Service extends Model
 		return $this->belongsTo(Cms::class,'cms_id','id');
     }
 
+	 public function faqs(){
+         return $this->hasMany(Faq::class,'type');
+    }
+
 }
 

@@ -14,8 +14,8 @@
 
     <div class="row">
     <div class="col-md-12">
-            {!! Form::label("Parent Page") !!}
-            {!! Form::select("type",ModelHelper::getPageSelectList(),null,["class"=>"form-control","placeholder"=>"choose parent Page"]) !!}
+            {!! Form::label("Policy Name") !!}
+            {!! Form::select("type",ModelHelper::getPolicySelectList(),null,["class"=>"form-control","placeholder"=>"choose parent Page"]) !!}
             <span class="text-danger">{{ $errors->first("type")}}</span>
         </div>
     </div><br>
