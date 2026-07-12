@@ -1,7 +1,7 @@
 @extends('admin.layouts')
 @section('title', 'Admin')
 @php
-    $name="Join Vote";$route="insurance-plan";
+    $name="Insurance Plan";$route="insurance-plan";
 @endphp
 @section('content_header')
     <h1 class="m-0 text-dark">{{$name}} Management</h1>
@@ -61,14 +61,29 @@
 @section("js")
 @parent
 <script>
-
-  CKEDITOR.replace( 'shortDescription',{ allowedContent:true,filebrowserUploadUrl: "{{route('ckeditor.upload', ['_token' => csrf_token() ])}}",
-      filebrowserUploadMethod: 'form'} );
-  CKEDITOR.replace( 'mediumDescription',{ allowedContent:true,filebrowserUploadUrl: "{{route('ckeditor.upload', ['_token' => csrf_token() ])}}",
-      filebrowserUploadMethod: 'form'} );
-  CKEDITOR.replace( 'longDescription',{ allowedContent:true,filebrowserUploadUrl: "{{route('ckeditor.upload', ['_token' => csrf_token() ])}}",
-      filebrowserUploadMethod: 'form'} );
-  CKEDITOR.replace( 'exlongDescription',{ allowedContent:true,filebrowserUploadUrl: "{{route('ckeditor.upload', ['_token' => csrf_token() ])}}",
-      filebrowserUploadMethod: 'form'} );
+  [
+      'shortDescription',
+      'detail_hero_subtitle',
+      'detail_feature_intro',
+      'detail_recommended_plan_title',
+      'detail_recommended_plan_description',
+      'detail_overview_content',
+      'detail_policy_types_intro',
+      'detail_insurer_intro',
+      'detail_how_it_works_description',
+      'detail_benefits_description',
+      'detail_buying_guide_description',
+      'detail_claims_description',
+      'detail_testimonial_description',
+      'detail_final_content'
+  ].forEach(function (field) {
+      if (document.getElementById(field)) {
+          CKEDITOR.replace(field, {
+              allowedContent: true,
+              filebrowserUploadUrl: "{{route('ckeditor.upload', ['_token' => csrf_token() ])}}",
+              filebrowserUploadMethod: 'form'
+          });
+      }
+  });
 </script>
 @stop

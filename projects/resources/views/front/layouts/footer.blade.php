@@ -185,3 +185,108 @@
     });
     srEls.forEach(el => io.observe(el));
 </script>
+
+
+
+    <script>
+        /* FAQ toggle */
+        function switchFaqTab(btn, panelId) {
+            // tabs
+            document.querySelectorAll('.faq-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // panels
+            document.querySelectorAll('.faq-panel').forEach(p => p.classList.remove('active'));
+            const panel = document.getElementById(panelId);
+            panel.classList.add('active');
+            }
+
+            function toggleFaq(el) {
+            const item = el.closest('.faq-item');
+            const isOpen = item.classList.contains('open');
+            // sibling items close
+            item.closest('.faq-panel')
+                .querySelectorAll('.faq-item')
+                .forEach(i => i.classList.remove('open'));
+            if (!isOpen) item.classList.add('open');
+            }
+
+     
+
+        // owlCarousel start
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // TESTIMONIAL SLIDER
+            var testimonialSwiper = new Swiper(".testimonialSwiper", {
+
+                loop: true,
+
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true
+                },
+
+
+                navigation: {
+                    nextEl: ".blog-next",
+                    prevEl: ".blog-prev"
+                },
+                spaceBetween: 30,
+
+                breakpoints: {
+
+                    0: {
+                        slidesPerView: 1
+                    },
+
+                    768: {
+                        slidesPerView: 2
+                    },
+
+                    992: {
+                        slidesPerView: 3
+                    }
+
+                }
+
+            });
+
+
+            // BLOG SLIDER
+            var blogSwiper = new Swiper(".blogSwiper", {
+
+                loop: true,
+
+                spaceBetween: 25,
+
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false
+                },
+
+                navigation: {
+                    nextEl: ".blog-next",
+                    prevEl: ".blog-prev"
+                },
+
+                breakpoints: {
+
+                    0: {
+                        slidesPerView: 1
+                    },
+
+                    768: {
+                        slidesPerView: 2
+                    },
+
+                    992: {
+                        slidesPerView: 3
+                    }
+
+                }
+
+            });
+
+        });
+        // owlCarousel end
+    </script>

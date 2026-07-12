@@ -1,6 +1,0 @@
-<li class="nav-item">
-    <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-        <i class="fas fa-expand-arrows-alt"></i>
-    </a>
-</li>
-<?php /**PATH D:\installed-softwares\xampp-8.2.12\htdocs\laravel-projects\kharido-policy\projects\resources\views/vendor/adminlte/partials/navbar/menu-item-fullscreen-widget.blade.php ENDPATH**/ ?>

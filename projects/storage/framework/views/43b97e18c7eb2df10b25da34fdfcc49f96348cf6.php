@@ -3,1836 +3,1428 @@
 <?php $__env->startSection('description', $data->meta_description); ?>
 <?php $__env->startSection('logo', $data->image); ?>
 <?php $__env->startSection('header-section'); ?>
-<?php echo $data->header_section; ?>
+    <?php echo $data->header_section; ?>
 
 <?php $__env->stopSection(); ?>
-<?php
-error_reporting(0);
-?>
 <?php $__env->startSection('footer-section'); ?>
-<?php echo $data->footer_section; ?>
+    <?php echo $data->footer_section; ?>
 
 <?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('container'); ?>
 <?php
-$name = $insurance->name;
-$bannerImage = asset('front/images/inner-banner.png');
-if ($insurance->bannerImage) {
-$bannerImage = asset($insurance->bannerImage);
-}
+    $policyName = $insurance->name ?? 'Insurance';
+
+    $cleanRows = function ($rows, $requiredKey = null) {
+        return collect(is_array($rows) ? $rows : [])
+            ->filter(function ($row) use ($requiredKey) {
+                if (!is_array($row)) {
+                    return false;
+                }
+
+                if ($requiredKey) {
+                    return trim((string)($row[$requiredKey] ?? '')) !== '';
+                }
+
+                return collect($row)->filter(fn($value) => trim((string)$value) !== '')->isNotEmpty();
+            })
+            ->values();
+    };
+
+    $heroTitle = $insurance->detail_hero_title ?: "Compare the Best {$policyName} Plans in India";
+    $heroSubtitle = $insurance->detail_hero_subtitle ?: $insurance->description;
+
+    $heroTags = $cleanRows($insurance->detail_hero_tags, 'text');
+    if ($heroTags->isEmpty()) {
+        $heroTags = collect([
+            ['icon_class' => 'fas fa-check-circle', 'text' => "Compare trusted {$policyName} options"],
+            ['icon_class' => 'fas fa-shield-alt', 'text' => 'Transparent premiums and benefits'],
+            ['icon_class' => 'fas fa-clock', 'text' => 'Quick expert guidance'],
+        ]);
+    }
+
+    $heroStats = $cleanRows($insurance->detail_hero_stats, 'text');
+    $trustItems = $cleanRows($insurance->detail_trust_items, 'text');
+    $featureItems = $cleanRows($insurance->detail_feature_items, 'title');
+    $recommendedPlanItems = $cleanRows($insurance->detail_recommended_plan_items, 'title');
+    $policyTypes = $cleanRows($insurance->detail_policy_types, 'title');
+    $howSteps = $cleanRows($insurance->detail_how_it_works_steps, 'title');
+    $benefits = $cleanRows($insurance->detail_benefits, 'title');
+    $buyingGuideItems = $cleanRows($insurance->detail_buying_guide_items, 'title');
+    $claimProcesses = $cleanRows($insurance->detail_claim_processes, 'title');
+    $claimGroups = $claimProcesses->groupBy(fn($item) => $item['type'] ?: 'Claim Process');
+    $testimonials = $cleanRows($insurance->detail_testimonials, 'message');
+    $trustStats = $cleanRows($insurance->detail_trust_stats, 'label');
+    $faqItems = $cleanRows($insurance->detail_faqs, 'question');
+
+    if ($faqItems->isEmpty() && isset($insurance->faqs)) {
+        $faqItems = $insurance->faqs
+            ->filter(fn($faq) => ($faq->publish ?? 'published') === 'published' && !empty($faq->question))
+            ->map(fn($faq) => ['question' => $faq->question, 'answer' => $faq->answer])
+            ->values();
+    }
+
+    $ourPartners = App\Models\OurClient::where('publish', 'published')->orderBy('id', 'desc')->get();
+    $finalContent = $insurance->detail_final_content ?: $insurance->shortDescription;
+    $recommendedPlanLabel = $insurance->detail_recommended_plan_label ?: 'Key Features';
+    $recommendedPlanTitle = $insurance->detail_recommended_plan_title ?: "Recommended <em>{$policyName}</em> Plans";
+    $recommendedPlanDescription = $insurance->detail_recommended_plan_description;
+    $showRecommendedPlans = $recommendedPlanItems->isNotEmpty() || $insurance->detail_recommended_plan_title || $insurance->detail_recommended_plan_description;
+    $hasHighlightedRecommendedPlan = $recommendedPlanItems->contains(fn($item) => !empty($item['highlight']));
+    $buyingGuideTitle = $insurance->detail_buying_guide_title ?: "How to Choose the Right {$policyName} Plan";
+    $buyingGuideTitleHtml = str_replace(e($policyName), '<em>'.e($policyName).'</em>', e($buyingGuideTitle));
 ?>
 
-<!--========================inner banner section start =======================================-->
-
-
-
 <style>
-:root {
-    --primary: #1040c4;
-    --primary-dark: #0a2d8f;
-    --primary-light: #1a55e8;
-    --accent: #f5c518;
-    --accent2: #00d4aa;
-    --white: #ffffff;
-    --light-bg: #f0f4ff;
-    --text-dark: #0d1b4b;
-    --text-muted: #6b7a9e;
-    --card-radius: 20px;
-    --shadow: 0 20px 60px rgba(16, 64, 196, 0.15);
-
-    --primary-pale: #eef3ff;
-    --teal: #00b8a9;
-    --orange: #f59c1a;
-    --red: #e84545;
-    --green: #2ecc71;
-    --yellow: #f5c518;
-    --text-mid: #3d4f7c;
-    --bg-page: #f5f7fc;
-    --shadow-sm: 0 4px 16px rgba(16, 64, 196, 0.10);
-    --shadow-md: 0 10px 36px rgba(16, 64, 196, 0.14);
-
-}
-
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-#mainNav {
-    background: #0e244c;
-    position: relative;
-}
-
-/* ── MAIN BANNER WRAPPER ── */
-.banner-wrapper {
-    /* max-width: 1200px; */
-    /* width: 100%; */
-    /* background: var(--white); */
-    /* background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 60%, #050f33 100%); */
-    /* border-radius: 28px; */
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    position: relative;
-    padding: 15px 10px;
-}
-
-.hero-quote {
-
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 60%, #050f33 100%);
-
-}
-
-/* ── LEFT HERO SECTION ── */
-.hero-section {
-    /* background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 60%, #050f33 100%); */
-    position: relative;
-    overflow: hidden;
-    padding: 50px 45px 40px;
-    min-height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-/* Decorative circles */
-.hero-section::before {
-    content: '';
-    position: absolute;
-    width: 420px;
-    height: 420px;
-    /* border-radius: 50%; */
-    background: rgba(255, 255, 255, 0.04);
-    top: -120px;
-    right: -120px;
-    pointer-events: none;
-}
-
-.hero-section::after {
-    content: '';
-    position: absolute;
-    width: 280px;
-    height: 280px;
-    /* border-radius: 50%; */
-    background: rgba(255, 255, 255, 0.05);
-    bottom: -80px;
-    left: -60px;
-    pointer-events: none;
-}
-
-/* Floating dots pattern */
-.dots-bg {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-    background-size: 30px 30px;
-    pointer-events: none;
-}
-
-.hero-top {
-    position: relative;
-    z-index: 2;
-}
-
-
-
-.hero-heading {
-    font-family: 'Playfair Display', serif;
-    color: #fff;
-    font-size: clamp(28px, 3.5vw, 40px);
-    font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 10px;
-}
-
-.hero-heading .highlight {
-    color: var(--accent);
-}
-
-.hero-sub {
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 14px;
-    font-weight: 400;
-    margin-bottom: 28px;
-    line-height: 1.6;
-}
-
-/* Tags row */
-.tag-row {
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-    margin-bottom: 32px;
-    align-items: flex-start;
-}
-
-.tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: 30px;
-    transition: background 0.2s;
-}
-
-.tag i {
-    color: var(--accent);
-    font-size: 11px;
-}
-
-/* Family image card */
-.family-card {
-    position: relative;
-    z-index: 2;
-    background: rgba(255, 255, 255, 0.10);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(12px);
-    border-radius: 18px;
-    padding: 20px 22px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.family-icon-wrap {
-    width: 64px;
-    height: 64px;
-    min-width: 64px;
-    background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-}
-
-.family-card-text h5 {
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 3px;
-}
-
-.family-card-text p {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 12px;
-    margin: 0;
-    line-height: 1.4;
-}
-
-.family-card .shield-badge {
-    margin-left: auto;
-    background: var(--accent2);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    letter-spacing: 0.5px;
-}
-
-/* Stats row */
-.stats-row {
-    display: flex;
-    gap: 0;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
-    overflow: hidden;
-    margin-top: 22px;
-    position: relative;
-    z-index: 2;
-}
-
-.stat-item {
-    flex: 1;
-    text-align: center;
-    padding: 16px 10px;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.stat-item:last-child {
-    border-right: none;
-}
-
-.stat-item .stat-num {
-    color: var(--accent);
-    font-size: 28px;
-    font-weight: 800;
-    display: block;
-    margin-bottom: 2px;
-}
-
-.stat-item .stat-label {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px;
-    line-height: 1.3;
-}
-
-/* Trust strip */
-.trust-strip {
-    background: var(--light-bg);
-    border-top: 1px solid #dce6f5;
-    padding: 14px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-.trust-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.trust-item i {
-    color: var(--primary);
-    font-size: 14px;
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 991px) {
-    .hero-section {
-        min-height: auto;
-        padding: 36px 28px 30px;
+    .pk-policy {
+        --pk-blue: #1040c4;
+        --pk-blue-dark: #0a2d8f;
+        --pk-ink: #0d1b4b;
+        --pk-muted: #6b7a9e;
+        --pk-soft: #eef3ff;
+        --pk-line: #dce6f5;
+        background: #fff;
+        color: var(--pk-ink);
     }
-
-    .trust-strip {
-        padding: 14px 20px;
-        gap: 18px;
+    .pk-policy #mainNav,
+    #mainNav {
+        background: #0e244c;
+        position: relative;
     }
-}
-
-@media (max-width: 767px) {
-    .stats-row {
+    .pk-section {
+        padding: 56px 0;
+    }
+    .pk-section-soft {
+        background: #eff4ff;
+    }
+    .pk-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--pk-soft);
+        color: var(--pk-blue);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 6px 16px;
+        border-radius: 999px;
+        margin-bottom: 14px;
+    }
+    .pk-title {
+        font-size: clamp(28px, 4vw, 44px);
+        font-weight: 400;
+        line-height: 1.15;
+        color: var(--pk-ink);
+        margin-bottom: 12px;
+    }
+    .pk-title em {
+        color: var(--pk-blue);
+        font-style: normal;
+    }
+    .pk-copy {
+        color: var(--pk-muted);
+        font-size: 16px;
+        line-height: 1.75;
+    }
+    .pk-copy p:last-child {
+        margin-bottom: 0;
+    }
+    .pk-hero {
+        /* background: linear-gradient(135deg, var(--pk-blue) 0%, var(--pk-blue-dark) 60%, #050f33 100%); */
+            background: linear-gradient(135deg, #05103a 0%, #071546 60%, #050f33 100%);
+        
+        padding: 28px 0 24px;
+    }
+    .pk-hero-panel {
+        background: rgba(255, 255, 255, .06);
+        border: 1px solid rgba(255, 255, 255, .14);
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(16, 64, 196, .18);
+    }
+    .pk-hero-content {
+        padding: 44px;
+        min-height: 100%;
+        display: flex;
         flex-direction: column;
+        justify-content: space-between;
     }
-
-    .stat-item {
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .pk-hero h1 {
+        color: #fff;
+        font-size: clamp(30px, 4vw, 46px);
+        font-weight: 400;
+        line-height: 1.18;
     }
-
-    .stat-item:last-child {
-        border-bottom: none;
+    .pk-hero-sub {
+        color: rgba(255, 255, 255, .76);
+        max-width: 680px;
+        margin-top: 14px;
     }
-
-    .input-group-custom {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .members-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .trust-strip {
-        gap: 14px;
-    }
-}
-
-/* Animate in */
-.banner-wrapper {
-    animation: fadeUp 0.6s ease both;
-}
-
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-
-/* key features start  */
-.key-feature-section {
-    background: #ffffff;
-    padding: 50px 0;
-}
-
-.section-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--primary-pale);
-    color: var(--primary);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    padding: 6px 16px;
-    border-radius: 30px;
-    margin-bottom: 14px;
-}
-
-.section-eyebrow i {
-    font-size: 12px;
-}
-
-.section-title {
-    font-family: 'Sora', sans-serif;
-    font-size: clamp(22px, 3vw, 32px);
-    font-weight: 800;
-    color: var(--text-dark);
-    line-height: 1.2;
-    margin-bottom: 12px;
-}
-
-.section-title span {
-    color: var(--primary);
-}
-
-.section-desc {
-    color: var(--text-muted);
-    font-size: 15px;
-    font-weight: 500;
-    max-width: 640px;
-    line-height: 1.7;
-    margin-bottom: 0;
-}
-
-/* ─── FEATURES TRACK ─── */
-.features-bg {
-    background: linear-gradient(135deg, #eef3ff 0%, #f5f7fc 60%, #e8f6f4 100%);
-    border-radius: 24px;
-    padding: 40px 32px 36px;
-    margin-top: 36px;
-    position: relative;
-    overflow: hidden;
-}
-
-.features-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle, rgba(16, 64, 196, 0.04) 1px, transparent 1px);
-    background-size: 28px 28px;
-    pointer-events: none;
-}
-
-/* Connector line behind circles */
-.features-track {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    gap: 0;
-}
-
-.features-track::before {
-    content: '';
-    position: absolute;
-    top: 56px;
-    /* center of circle */
-    left: 80px;
-    right: 80px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--teal), var(--orange), var(--red), var(--primary));
-    border-radius: 4px;
-    z-index: 0;
-}
-
-/* Each feature node */
-.feat-node {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    padding: 0 8px;
-    cursor: pointer;
-}
-
-.feat-circle {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background: var(--white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    position: relative;
-    transition: transform 0.28s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.28s;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 16px;
-}
-
-/* Coloured ring */
-.feat-circle::before {
-    content: '';
-    position: absolute;
-    inset: -5px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: var(--ring-color);
-    border-right-color: var(--ring-color);
-    transition: transform 0.4s;
-}
-
-.feat-node:hover .feat-circle {
-    transform: translateY(-6px) scale(1.06);
-    box-shadow: 0 16px 40px rgba(16, 64, 196, 0.18);
-}
-
-.feat-node:hover .feat-circle::before {
-    transform: rotate(90deg);
-}
-
-/* Active / selected state */
-.feat-node.active .feat-circle {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    box-shadow: 0 10px 30px rgba(16, 64, 196, 0.35);
-}
-
-.feat-node.active .feat-circle .feat-emoji {
-    filter: brightness(10);
-}
-
-.feat-emoji {
-    font-size: 34px;
-    line-height: 1;
-    transition: filter 0.2s;
-}
-
-.feat-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-dark);
-    line-height: 1.4;
-    max-width: 100px;
-    transition: color 0.2s;
-}
-
-.feat-node:hover .feat-label,
-.feat-node.active .feat-label {
-    color: var(--primary);
-}
-
-
-/* Responsive */
-@media (max-width: 768px) {
-    .features-track {
+    .pk-tag-list,
+    .pk-trust-strip,
+    .pk-hero-stats {
+        display: flex;
         flex-wrap: wrap;
+        gap: 12px;
+    }
+    .pk-tag,
+    .pk-trust-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .pk-tag {
+        color: #fff;
+        background: rgba(255, 255, 255, .10);
+        border: 1px solid rgba(255, 255, 255, .16);
+        padding: 8px 14px;
+    }
+    .pk-tag i {
+        color: #f5c518;
+    }
+    .pk-hero-stats {
+        margin-top: 34px;
+    }
+    .pk-stat-chip {
+        flex: 1 1 160px;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, .12);
+        background: rgba(255, 255, 255, .07);
+        border-radius: 14px;
+        padding: 18px;
+        min-height: 96px;
+    }
+    .pk-stat-chip i {
+        color: #f5c518;
+        font-size: 24px;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .pk-quote-card {
+        background: #fff;
+        border-radius: 0 22px 0px 0;
+        padding: 32px;
+        height: 100%;
+    }
+    .pk-quote-card h3 {
+        font-weight: 800;
+        color: var(--pk-ink);
+        margin-bottom: 6px;
+    }
+    .pk-form-label {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--pk-ink);
+        margin-bottom: 6px;
+    }
+    .pk-input {
+        width: 100%;
+        border: 1px solid #dbe4f0;
+        border-radius: 10px;
+        padding: 11px 12px;
+        color: var(--pk-ink);
+        outline: none;
+    }
+    .pk-input:focus {
+        border-color: var(--pk-blue);
+        box-shadow: 0 0 0 3px rgba(16, 64, 196, .08);
+    }
+    .pk-submit {
+        width: 100%;
+        border: 0;
+        border-radius: 12px;
+        background: var(--pk-blue);
+        color: #fff;
+        font-weight: 800;
+        padding: 13px 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .pk-trust-strip {
+        background: #f0f4ff;
+        border-top: 1px solid var(--pk-line);
+        padding: 14px 20px;
+        justify-content: center;
+    }
+    .pk-trust-item {
+        color: var(--pk-muted);
+        padding: 5px 8px;
+    }
+    .pk-card-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 20px;
     }
-
-    .features-track::before {
-        display: none;
+    .pk-card-grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    .feat-node {
-        flex: 0 0 calc(33.33% - 14px);
+    .pk-card {
+        background: #fff;
+        border: 1px solid #e5ecf8;
+        border-radius: 16px;
+        padding: 24px;
+        height: 100%;
+        box-shadow: 0 10px 25px rgba(16, 64, 196, .06);
     }
-}
-
-@media (max-width: 480px) {
-    .feat-node {
-        flex: 0 0 calc(50% - 12px);
+    .pk-card-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--pk-soft);
+        color: var(--pk-blue);
+        font-size: 24px;
+        margin-bottom: 14px;
     }
-}
-
-
-/* key features end */
-/* policy overview section start */
-.policy-overview-section {
-    padding: 50px 0;
-    background: #eff4ff;
-}
-
-.policy-overview-section p {
-    text-align: left;
-}
-
-/* policy overview section end */
-
-.insurance-type-section .cat-card {
-    background: #eff4ff;
-    border: 1px solid #c8d7f9;
-}
-
-
-/* how it works css start  */
-
-
-.how-it-works-section {
-    padding: 50px 0;
-    background: var(--white);
-}
-
-
-
-
-
-/* ── LAYOUT ── */
-.hiw-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 56px;
-    align-items: center;
-    margin-top: 50px;
-}
-
-/* ── ACCORDION STEPS ── */
-.steps-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.step-item {
-    border-left: 3px solid #dde6f5;
-    padding: 20px 0 20px 24px;
-    cursor: pointer;
-    position: relative;
-    transition: border-color 0.25s;
-}
-
-.step-item::before {
-    /* Step number dot on the left border */
-    content: attr(data-num);
-    position: absolute;
-    left: -14px;
-    top: 20px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: #dde6f5;
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.25s, color 0.25s;
-    line-height: 1;
-    text-align: center;
-    padding-top: 1px;
-}
-
-/* Active state */
-.step-item.active {
-    border-left-color: var(--primary);
-}
-
-.step-item.active::before {
-    background: var(--primary);
-    color: #fff;
-}
-
-.step-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.step-title {
-    font-family: 'Sora', sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text-mid);
-    transition: color 0.2s;
-    margin: 0;
-}
-
-.step-item.active .step-title {
-    color: var(--text-dark);
-}
-
-.step-arrow {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    border-radius: 50%;
-    border: 2px solid #dde6f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    font-size: 11px;
-    transition: all 0.25s;
-}
-
-.step-item.active .step-arrow {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: #fff;
-    transform: rotate(90deg);
-}
-
-/* Description – slide open */
-.step-desc {
-    font-size: 14px;
-    color: var(--text-muted);
-    font-weight: 500;
-    line-height: 1.7;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.3s;
-    opacity: 0;
-    margin-top: 0;
-}
-
-.step-item.active .step-desc {
-    max-height: 120px;
-    opacity: 1;
-    margin-top: 10px;
-}
-
-/* Progress bar under active step */
-.step-progress {
-    height: 3px;
-    background: #eef3ff;
-    border-radius: 4px;
-    margin-top: 14px;
-    overflow: hidden;
-    display: none;
-}
-
-.step-item.active .step-progress {
-    display: block;
-}
-
-.step-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--teal));
-    border-radius: 4px;
-    animation: fillBar 4s linear forwards;
-}
-
-@keyframes fillBar {
-    from {
-        width: 0;
+    .pk-card h3,
+    .pk-card h4,
+    .pk-card h5 {
+        color: var(--pk-ink);
+        font-weight: 700;
+        font-size: 16px;
     }
-
-    to {
-        width: 100%;
+    .pk-card p {
+        color: var(--pk-muted);
+        line-height: 1.65;
+        margin-bottom: 0;
     }
-}
-
-
-
-/* ── RIGHT VISUAL PANEL ── */
-.hiw-visual {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Big faint circle bg */
-.visual-bg-circle {
-    position: absolute;
-    width: 380px;
-    height: 380px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-pale) 0%, #e0ecff 100%);
-    z-index: 0;
-}
-
-/* Center card */
-.visual-center-card {
-    position: relative;
-    z-index: 2;
-    background: var(--white);
-    border-radius: 24px;
-    padding: 36px 32px;
-    box-shadow: 0 20px 60px rgba(16, 64, 196, 0.14);
-    width: 100%;
-    max-width: 360px;
-}
-
-/* Active step indicator inside card */
-.card-step-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--primary-pale);
-    color: var(--primary);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 6px 14px;
-    border-radius: 30px;
-    margin-bottom: 20px;
-    transition: all 0.3s;
-}
-
-.card-step-badge .badge-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--primary);
-    animation: pulse 1.8s infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        box-shadow: 0 0 0 0 rgba(16, 64, 196, 0.5);
+    .pk-feature-section {
+        background:
+            linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
     }
-
-    50% {
-        box-shadow: 0 0 0 7px rgba(16, 64, 196, 0);
+    .pk-feature-shell {
+        border: 1px solid #e1eaf8;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, .82);
+        box-shadow: 0 22px 60px rgba(16, 64, 196, .08);
+        padding: 38px;
     }
-}
-
-/* Big emoji in card */
-.card-emoji-wrap {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 38px;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 28px rgba(16, 64, 196, 0.3);
-    transition: all 0.3s;
-}
-
-.card-title {
-    font-family: 'Sora', sans-serif;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin-bottom: 8px;
-    transition: all 0.3s;
-}
-
-.card-desc {
-    font-size: 13px;
-    color: var(--text-muted);
-    font-weight: 500;
-    line-height: 1.65;
-    margin-bottom: 22px;
-    transition: all 0.3s;
-}
-
-/* Mini checklist inside card */
-.card-checks {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.card-check-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-mid);
-}
-
-.card-check-item .chk {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    border-radius: 6px;
-    background: #eef8f5;
-    color: var(--teal);
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0);
+    .pk-feature-header {
+        max-width: 860px;
+        margin: 0 auto 34px;
+        text-align: center;
     }
-
-    50% {
-        transform: translateY(-8px);
+    .pk-feature-header .sec-h,
+    .pk-feature-header h2 {
+        color: var(--pk-ink);
+        font-size: clamp(30px, 4vw, 46px);
+        font-weight: 400;
+        line-height: 1.12;
+        margin-bottom: 0;
     }
-}
-
-/* Steps dots nav */
-.steps-nav {
-    display: flex;
-    gap: 8px;
-    margin-top: 24px;
-    justify-content: center;
-}
-
-.nav-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #dde6f5;
-    cursor: pointer;
-    transition: all 0.25s;
-}
-
-.nav-dot.active {
-    width: 24px;
-    border-radius: 4px;
-    background: var(--primary);
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-    .hiw-layout {
-        grid-template-columns: 1fr;
-        gap: 40px;
+    .pk-feature-header em {
+        color: var(--pk-blue);
+        font-style: normal;
     }
-
-    .hiw-visual {
-        order: -1;
+    .pk-feature-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
     }
-
-    .visual-bg-circle {
-        width: 280px;
-        height: 280px;
-    }
-}
-
-/* how it works css end */
-
-/* key benefits start  */
-.key-benefit-section {
-    padding: 50px 0;
-    background: #eff4ff;
-}
-
-
-
-    /* ─── CARDS GRID ─── */
-    .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-    }
-
-    /* Wide card spans 2 cols */
-    .benefit-card.wide {
-      grid-column: span 2;
-    }
-
-    .benefit-card {
-      background: var(--white);
-      border-radius: 20px;
-      padding: 28px 26px;
-      border: 2px solid #e5ecf8;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform .28s cubic-bezier(.34, 1.56, .64, 1),
-        box-shadow .28s, border-color .28s;
-    }
-
-    .benefit-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 18px 48px rgba(16, 64, 196, .14);
-      border-color: var(--card-color, var(--primary));
-    }
-
-    /* Top accent line */
-    .benefit-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--card-color, var(--primary));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform .3s ease;
-    }
-
-    .benefit-card:hover::before {
-      transform: scaleX(1);
-    }
-
-    /* Faint large icon watermark */
-    .benefit-card::after {
-      content: attr(data-emoji);
-      position: absolute;
-      bottom: -10px;
-      right: 10px;
-      font-size: 72px;
-      opacity: .06;
-      pointer-events: none;
-      line-height: 1;
-      transition: opacity .3s, transform .3s;
-    }
-
-    .benefit-card:hover::after {
-      opacity: .10;
-      transform: scale(1.1) rotate(-5deg);
-    }
-
-    /* Icon circle */
-    .b-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      margin-bottom: 18px;
-      background: var(--icon-bg, var(--primary-pale));
-      transition: transform .3s;
-    }
-
-    .benefit-card:hover .b-icon {
-      transform: scale(1.1) rotate(-4deg);
-    }
-
-    .b-title {
-      font-family: 'Sora', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-dark);
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
-
-    .b-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 500;
-      line-height: 1.65;
-    }
-
-    /* Highlight chip inside card */
-    .b-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--chip-bg, var(--primary-pale));
-      color: var(--chip-txt, var(--primary));
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .4px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-top: 14px;
-    }
-
-    /* Wide card: horizontal layout */
-    .benefit-card.wide .b-inner {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-    }
-
-    .benefit-card.wide .b-icon {
-      min-width: 56px;
-    }
-
-    .benefit-card.wide .b-text {
-      flex: 1;
-    }
-
-
-    /* ─── ANIMATIONS ─── */
-    .benefit-card {
-      animation: fadeUp .5s both;
-    }
-
-    .benefit-card:nth-child(1) {
-      animation-delay: .05s;
-    }
-
-    .benefit-card:nth-child(2) {
-      animation-delay: .10s;
-    }
-
-    .benefit-card:nth-child(3) {
-      animation-delay: .15s;
-    }
-
-    .benefit-card:nth-child(4) {
-      animation-delay: .20s;
-    }
-
-    .benefit-card:nth-child(5) {
-      animation-delay: .25s;
-    }
-
-    .benefit-card:nth-child(6) {
-      animation-delay: .30s;
-    }
-
-    .benefit-card:nth-child(7) {
-      animation-delay: .35s;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(26px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 1024px) {
-      .benefits-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .benefit-card.wide {
-        grid-column: span 2;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .benefits-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .benefit-card.wide {
-        grid-column: span 1;
-      }
-
-      .benefit-card.wide .b-inner {
+    .pk-feature-card {
+        position: relative;
+        display: flex;
         flex-direction: column;
-      }
-
-      .stat-cell {
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, .12);
-      }
-
-      .stat-cell:last-child {
-        border-bottom: none;
-      }
+        min-height: 258px;
+        overflow: hidden;
+        border: 1px solid #e3ecfa;
+        border-radius: 18px;
+        background: #fff;
+        padding: 24px;
+        box-shadow: 0 14px 34px rgba(13, 27, 75, .06);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     }
-    
-/* key benefits end */
+    .pk-feature-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        height: 4px;
+        background: linear-gradient(90deg, var(--pk-blue), #38bdf8);
+    }
+    .pk-feature-card:hover {
+        transform: translateY(-5px);
+        border-color: #c8d8f2;
+        box-shadow: 0 22px 48px rgba(16, 64, 196, .12);
+    }
+    .pk-feature-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff5ff;
+        color: var(--pk-blue);
+        font-size: 24px;
+        margin-bottom: 22px;
+        box-shadow: inset 0 0 0 1px #dfe9fb;
+    }
+    .pk-feature-card h3 {
+        color: var(--pk-ink);
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.25;
+        margin-bottom: 12px;
+    }
+    .pk-feature-card p {
+        color: var(--pk-muted);
+        font-size: 15px;
+        line-height: 1.65;
+        margin-bottom: 0;
+    }
+    .pk-recommended-section {
+        background: #fff;
+        padding-top: 22px;
+    }
+    .pk-recommended-header {
+        max-width: 1040px;
+        margin: 0 auto 38px;
+        text-align: center;
+    }
+    .pk-recommended-header .pk-title {
+        font-size: clamp(30px, 4vw, 44px);
+        margin-bottom: 12px;
+    }
+    .pk-recommended-header .pk-title p {
+        margin-bottom: 0;
+    }
+    .pk-recommended-header .pk-copy {
+        max-width: 1120px;
+        margin: 0 auto;
+        font-size: 17px;
+        line-height: 1.55;
+        color: #3f4c66;
+    }
+    .pk-plan-rail {
+        position: relative;
+        max-width: 1180px;
+        margin: 0 auto;
+        border-radius: 24px;
+        border: 1px solid #e2eaf8;
+        background: linear-gradient(105deg, #f3f7ff 0%, #f8fbff 58%, #edfafa 100%);
+        padding: 42px 56px 38px;
+        overflow: hidden;
+        box-shadow: 0 18px 50px rgba(16, 64, 196, .08);
+    }
+    .pk-plan-rail::before {
+        content: "";
+        position: absolute;
+        left: 11%;
+        right: 11%;
+        top: 50%;
+        height: 3px;
+        transform: translateY(-22px);
+        background: linear-gradient(90deg, #56b36c, #f7b731, #ff6b4a, #845ec2);
+        opacity: .86;
+    }
+    .pk-plan-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 34px;
+    }
+    .pk-plan-node {
+        min-width: 0;
+        text-align: center;
+    }
+    .pk-plan-circle {
+        position: relative;
+        z-index: 1;
+        width: 112px;
+        height: 112px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 8px solid #fff;
+        color: var(--pk-blue);
+        font-size: 30px;
+        box-shadow: 0 14px 30px rgba(13, 27, 75, .08);
+    }
+    .pk-plan-circle::before {
+        content: "";
+        position: absolute;
+        inset: -14px;
+        border-radius: 50%;
+        border: 3px solid #2b3d59;
+        border-left-color: transparent;
+        border-bottom-color: transparent;
+    }
+    .pk-plan-node.is-highlight .pk-plan-circle {
+        background: #1f4ed8;
+        color: #fff;
+        box-shadow: 0 18px 36px rgba(31, 78, 216, .26);
+    }
+    .pk-plan-node.is-highlight .pk-plan-circle::before {
+        border-color: #2b3d59;
+        border-left-color: transparent;
+    }
+    .pk-plan-node h3 {
+        color: var(--pk-ink);
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.25;
+        margin: 0 auto;
+        max-width: 170px;
+    }
+    .pk-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 14px;
+        background: var(--pk-soft);
+        color: var(--pk-blue);
+        border-radius: 999px;
+        padding: 5px 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .pk-guide-section {
+        background: linear-gradient(180deg, #f8fbff 0%, #f3f7fc 100%);
+    }
+    .pk-guide-header {
+        max-width: 980px;
+        margin: 0 auto 52px;
+        text-align: center;
+    }
+    .pk-guide-header .pk-eyebrow {
+        border: 1px solid #bdd1ff;
+        background: #eef4ff;
+        box-shadow: 0 8px 18px rgba(16, 64, 196, .06);
+    }
+    .pk-guide-header .pk-title {
+        font-size: clamp(34px, 4vw, 52px);
+        line-height: 1.08;
+        margin-bottom: 18px;
+    }
+    .pk-guide-header .pk-title em {
+        font-style: italic;
+    }
+    .pk-guide-header .pk-copy {
+        max-width: 780px;
+        margin: 0 auto;
+        color: #596782;
+        font-size: 17px;
+        line-height: 1.65;
+    }
+    .pk-guide-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px 28px;
+    }
+    .pk-guide-card {
+        position: relative;
+        display: grid;
+        grid-template-columns: 68px 1fr 38px;
+        gap: 18px;
+        align-items: start;
+        min-height: 172px;
+        border: 1px solid #dfe8f7;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, .92);
+        padding: 30px;
+        box-shadow: 0 16px 40px rgba(13, 27, 75, .05);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .pk-guide-card:hover {
+        transform: translateY(-4px);
+        border-color: #bdd0ef;
+        box-shadow: 0 22px 48px rgba(13, 27, 75, .09);
+    }
+    .pk-guide-number {
+        width: 68px;
+        height: 68px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef4ff;
+        color: var(--pk-blue);
+        font-size: 26px;
+        font-weight: 900;
+        line-height: 1;
+    }
+    .pk-guide-card:nth-child(4n + 2) .pk-guide-number {
+        background: #e5fbf7;
+        color: #00a99d;
+    }
+    .pk-guide-card:nth-child(4n + 3) .pk-guide-number {
+        background: #e9f8ef;
+        color: #22ad63;
+    }
+    .pk-guide-card:nth-child(4n + 4) .pk-guide-number {
+        background: #f3ecff;
+        color: #7c3aed;
+    }
+    .pk-guide-content h3 {
+        color: var(--pk-ink);
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1.3;
+        margin-bottom: 10px;
+    }
+    .pk-guide-content p {
+        color: #64749a;
+        font-size: 16px;
+        line-height: 1.62;
+        margin: 0;
+    }
+    .pk-guide-check {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 2px solid #dbe2ec;
+        color: #b8c3d4;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        justify-self: end;
+    }
+    .pk-guide-card:nth-child(4n + 1) {
+        border-color: #1040c4;
+        border-left: 10px solid #1040c4;
+    }
+    .pk-guide-card:nth-child(4n + 2) {
+        border-left: 10px solid #00a99d;
+    }
+    .pk-guide-card:nth-child(4n + 3) {
+        border-left: 10px solid #22ad63;
+    }
+    .pk-guide-card:nth-child(4n + 4) {
+        border-left: 10px solid #7c3aed;
+    }
+    .pk-guide-card:nth-child(4n + 1) .pk-guide-check {
+        background: #1040c4;
+        border-color: #1040c4;
+        color: #fff;
+    }
+    .pk-steps {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 36px;
+        align-items: start;
+    }
+    .pk-step {
+        border-left: 3px solid #dbe6f7;
+        padding: 18px 0 18px 24px;
+        position: relative;
+        cursor: pointer;
+    }
+    .pk-step::before {
+        content: attr(data-num);
+        position: absolute;
+        left: -15px;
+        top: 18px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #dbe6f7;
+        color: var(--pk-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+    }
+    .pk-step.active {
+        border-left-color: var(--pk-blue);
+    }
+    .pk-step.active::before {
+        background: var(--pk-blue);
+        color: #fff;
+    }
+    .pk-step h3 {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+    .pk-step p {
+        color: var(--pk-muted);
+        margin: 0;
+        line-height: 1.65;
+    }
+    .pk-step-card {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        border-radius: 20px;
+        border: 1px solid #e5ecf8;
+        overflow: hidden;
+        box-shadow: 0 18px 45px rgba(16, 64, 196, .11);
+        position: sticky;
+        top: 96px;
+    }
+    .pk-step-card-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 26px 26px 20px;
+        border-bottom: 1px solid #e8eef9;
+        background: #fff;
+    }
+    #policyStepIcon {
+        flex: 0 0 62px;
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: var(--pk-blue);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        box-shadow: 0 14px 26px rgba(16, 64, 196, .18);
+    }
+    .pk-step-label {
+        display: block;
+        color: var(--pk-blue);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .8px;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+    .pk-step-card h3 {
+        color: var(--pk-ink);
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.25;
+        margin: 0;
+    }
+    .pk-step-card-body {
+        padding: 22px 26px 26px;
+    }
+    .pk-step-card-body .pk-copy {
+        font-size: 15px;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+    .pk-check-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+    }
+    .pk-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 46px;
+        border: 1px solid #dfe8f7;
+        border-radius: 12px;
+        background: #fff;
+        padding: 10px 12px;
+        color: var(--pk-muted);
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 1.35;
+    }
+    .pk-check span {
+        flex: 0 0 24px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #ecfdf5;
+        color: #059669;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+    }
+    .pk-check span i {
+        color: inherit;
+        font-size: inherit;
+        line-height: 1;
+    }
+    .pk-claim-tabs {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+    .pk-claim-tab {
+        border-radius: 999px !important;
+        padding: 11px 22px !important;
+        font-weight: 800 !important;
+        border: 1px solid #c3cff0 !important;
+        color: var(--pk-blue) !important;
+    }
+    .pk-claim-tab.active {
+        background: var(--pk-blue) !important;
+        color: #fff !important;
+    }
+    .pk-testimonial-track {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+    .pk-stars {
+        color: #f5c518;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    .pk-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--pk-soft);
+        color: var(--pk-blue);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+    }
+    .pk-trust-stats {
+        margin-top: 28px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+    .pk-trust-stat {
+        text-align: center;
+        min-width: 130px;
+    }
+    .pk-trust-stat strong {
+        display: block;
+        font-size: 22px;
+        color: var(--pk-blue);
+    }
+    .pk-faq-item {
+        background: #fff;
+        border: 1px solid #e5ecf8;
+        border-radius: 14px;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+    .pk-faq-q {
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        cursor: pointer;
+        font-weight: 800;
+    }
+    .pk-faq-a {
+        display: none;
+        padding: 0 20px 18px;
+        color: var(--pk-muted);
+        line-height: 1.7;
+    }
+    .pk-faq-item.open .pk-faq-a {
+        display: block;
+    }
+    @media (max-width: 991px) {
+        .pk-quote-card {
+            border-radius: 0;
+        }
+        .pk-card-grid,
+        .pk-card-grid.two,
+        .pk-feature-grid,
+        .pk-plan-grid,
+        .pk-guide-grid,
+        .pk-testimonial-track,
+        .pk-steps {
+            grid-template-columns: 1fr 1fr;
+        }
+        .pk-feature-shell {
+            padding: 28px;
+        }
+        .pk-plan-rail {
+            padding: 34px 28px;
+        }
+        .pk-plan-rail::before {
+            display: none;
+        }
+        .pk-guide-card {
+            grid-template-columns: 60px 1fr;
+        }
+        .pk-guide-check {
+            position: absolute;
+            top: 22px;
+            right: 22px;
+        }
+        .pk-step-card {
+            position: static;
+        }
+    }
+    @media (max-width: 767px) {
+        .pk-hero-content,
+        .pk-quote-card {
+            padding: 24px;
+        }
+        .pk-card-grid,
+        .pk-card-grid.two,
+        .pk-feature-grid,
+        .pk-plan-grid,
+        .pk-guide-grid,
+        .pk-testimonial-track,
+        .pk-steps {
+            grid-template-columns: 1fr;
+        }
+        .pk-feature-shell {
+            padding: 22px;
+            border-radius: 18px;
+        }
+        .pk-feature-card {
+            min-height: 0;
+        }
+        .pk-plan-rail {
+            padding: 26px 20px;
+            border-radius: 18px;
+        }
+        .pk-plan-grid {
+            gap: 22px;
+        }
+        .pk-plan-circle {
+            width: 92px;
+            height: 92px;
+            font-size: 25px;
+        }
+        .pk-guide-header {
+            margin-bottom: 30px;
+        }
+        .pk-guide-card {
+            grid-template-columns: 52px 1fr;
+            gap: 14px;
+            min-height: 0;
+            padding: 22px;
+            border-radius: 18px;
+        }
+        .pk-guide-number {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            font-size: 21px;
+        }
+        .pk-guide-content h3 {
+            font-size: 17px;
+            padding-right: 36px;
+        }
+        .pk-guide-content p {
+            font-size: 15px;
+        }
+    }
 </style>
 
-<section class="hero-quote">
-    <div class="container">
-        <div class="banner-wrapper">
-            <div class="row g-0">
-
-                <!-- ══ LEFT HERO ══ -->
-                <div class="col-lg-7">
-                    <div class="hero-section">
-                        <div class="dots-bg"></div>
-
-                        <div class="hero-top">
-
-
-                            <h2 class="hero-heading">
-                                Compare the Best Health Insurance Plans in India in 60 Seconds<br />
-                                
-                            </h2>
-                            
-
-                            <!-- Tags -->
-                            <div class="tag-row">
-                                <span class="tag"><i class="fas fa-check-circle"></i> Get Up to ₹25 Lakh Health
-                                    Cover</span>
-                                <span class="tag"><i class="fas fa-shield-alt"></i>Premium Starting from just
-                                    ₹18/day</span>
-                                <span class="tag"><i class="fas fa-clock"></i> Save up to ₹75,000 in taxes under
-                                    Section 80D</span>
-                            </div>
-
-                            <!-- Family card -->
-                            
-                        </div>
-
-                        <!-- Stats -->
-                        <div class="stats-row">
-                            <div class="stat-item">
-                                <span class="stat-num"><i class="fas fa-regular fa-house"></i></span>
-                                <span class="stat-label">IRDAI-approved insurers</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-num"><i class="fa-solid fa-book-open-reader"></i></span>
-                                <span class="stat-label">10,000+ cashless hospitals</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-num"><i class="fa-regular fa-newspaper"></i></span>
-                                <span class="stat-label">Zero spam calls</span>
-                            </div>
-                        </div>
-
-                    </div><!-- /hero-section -->
-                </div>
-
-                <!-- ══ RIGHT FORM ══ -->
-                <div class="col-lg-5">
-                    <div class="quote-card sr">
-                        <div class="qc-header">
-                            <div class="qc-header-tag"><i class="fas fa-bolt me-1"></i> Get Instant Quote</div>
-                            <h3><?php echo e($insurance->name); ?></h3>
-                            <div class="qc-header-sub">Fill in your details to view the best available plans</div>
-                        </div>
-                        <form id="getPolicyFromId" action="<?php echo e(route('contactPost')); ?>" method="post">
-                            <?php echo csrf_field(); ?>
-                            <input type="hidden" name="service" value="<?php echo e($insurance->id); ?>">
-                            <div class="qc-body">
-                                <!-- Name + Mobile -->
-                                <div class="form-row-2">
-                                    <div class="form-group">
-                                        <div class="form-label-pl">
-                                            <i class="fas fa-user"></i> Full Name <em>*</em>
-                                        </div>
-                                        <div class="input-wrap">
-                                            <input class="form-input has-icon" type="text" placeholder="Rahul Sharma"
-                                                name="name" required>
-                                            <i class="fas fa-user input-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="form-label-pl">
-                                            <i class="fas fa-mobile-screen"></i> Mobile <em>*</em>
-                                        </div>
-                                        <div class="input-wrap">
-                                            <input class="form-input has-icon" type="tel" placeholder="+91 9999999999"
-                                                name="mobile" required>
-                                            <i class="fas fa-mobile-screen input-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Email + City -->
-                                <div class="form-row-2">
-                                    <div class="form-group">
-                                        <div class="form-label-pl">
-                                            <i class="fas fa-envelope"></i> Email Address (optional)
-                                        </div>
-                                        <div class="input-wrap">
-                                            <input class="form-input has-icon" type="email" name="email"
-                                                placeholder="rahul@email.com">
-                                            <i class="fas fa-envelope input-icon"></i>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="form-label-pl">
-                                            <i class="fas fa-location-dot"></i> City
-                                        </div>
-                                        <div class="input-wrap">
-                                            <input class="form-input has-icon" type="text" name="city"
-                                                placeholder="New Delhi">
-                                            <i class="fas fa-location-dot input-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Message -->
-                                <div class="form-group">
-                                    <div class="form-label-pl">
-                                        <i class="fa-regular fa-message"></i> Message
-                                    </div>
-                                    <div class="input-wrap">
-                                        <input class="form-input has-icon" type="text" placeholder="Hello.."
-                                            name="message">
-                                        <i class="fa-regular fa-message input-icon"></i>
-                                    </div>
-                                </div>
-
-
-                                <!-- Checkbox -->
-                                
-
-                                <!-- Submit -->
-                                <button class="btn-submit">
-                                    Submit
-                                    <i class="fas fa-arrow-right fa-sm"></i>
-                                </button>
-
-                                <div class="qc-footer">
-                                    <i class="fas fa-lock"></i>
-                                    Your data is safe &amp; encrypted · No spam, ever
-                                </div>
-
-                            </div>
-
-                        </form>
-                    </div>
-                </div>
-
-            </div><!-- /row -->
-
-            <!-- Trust Strip -->
-            <div class="trust-strip">
-                <div class="trust-item"><i class="fas fa-lock"></i> 100% Secure & Safe</div>
-                <div class="trust-item"><i class="fas fa-headset"></i> 24/7 Customer Support</div>
-                <div class="trust-item"><i class="fas fa-bolt"></i> Instant Policy Issuance</div>
-                <div class="trust-item"><i class="fas fa-hospital"></i> 22,100+ Cashless Hospitals</div>
-            </div>
-
-        </div><!-- /banner-wrapper -->
-    </div>
-    <section />
-
-
-    <!--========================inner banner section end =======================================-->
-
-
-    <!-- ═══════════════════════════════════════  SECTION 1 – HERO QUOTE ═══════════════════════════════════════ -->
-
-
-    <?php
-    $Keyfeature = App\Models\KeyFeature::where('publish', 'published')->orderBy('ordering')->get();
-    ?>
-    <?php if($Keyfeature->count() > 0): ?>
-    <!-- ═══ BENEFITS ═══ -->
-    <section class="benefits" id="benefits">
+<main class="pk-policy">
+    <section class="pk-hero">
         <div class="container">
-            <div class="text-center mb-5 sr">
-                <?php echo $data->mediumDescription; ?>
+            <div class="pk-hero-panel">
+                <div class="row g-0">
+                    <div class="col-lg-7">
+                        <div class="pk-hero-content">
+                            <div>
+                                <h1><?php echo e($heroTitle); ?></h1>
+                                <?php if($heroSubtitle): ?>
+                                    <div class="pk-hero-sub pk-copy"><?php echo $heroSubtitle; ?></div>
+                                <?php endif; ?>
 
-            </div>
-            <div class="row g-4">
-                <?php $__currentLoopData = $Keyfeature; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <div class="col-sm-6 col-lg-3 sr sr-d1">
-                    <div class="benefit-card bc1">
-                        <i class="<?php echo e($f->icon_class); ?>"></i>
-                        <h5><?php echo e($f->title); ?></h5>
-                        <p><?php echo e($f->descreption); ?></p>
+                                <?php if($heroTags->isNotEmpty()): ?>
+                                    <div class="pk-tag-list mt-4">
+                                        <?php $__currentLoopData = $heroTags; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <span class="pk-tag"><i class="<?php echo e($item['icon_class'] ?: 'fas fa-check-circle'); ?>"></i><?php echo e($item['text']); ?></span>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <?php if($heroStats->isNotEmpty()): ?>
+                                <div class="pk-hero-stats">
+                                    <?php $__currentLoopData = $heroStats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <div class="pk-stat-chip">
+                                            <i class="<?php echo e($item['icon_class'] ?: 'fas fa-shield-alt'); ?>"></i>
+                                            <span><?php echo e($item['text']); ?></span>
+                                        </div>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="pk-quote-card">
+                            <div class="mb-4">
+                                <span class="pk-eyebrow"><i class="fas fa-bolt"></i> Get Instant Quote</span>
+                                <h3><?php echo e($policyName); ?></h3>
+                                <p class="pk-copy mb-0">Fill in your details to view the best available plans.</p>
+                            </div>
+
+                            <form id="getPolicyFromId" action="<?php echo e(route('contactPost')); ?>" method="post">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="service" value="<?php echo e($insurance->id); ?>">
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="pk-form-label">Full Name *</label>
+                                        <input class="pk-input" type="text" name="name" placeholder="Rahul Sharma" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="pk-form-label">Mobile *</label>
+                                        <input class="pk-input" type="tel" name="mobile" placeholder="+91 9999999999" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="pk-form-label">Email *</label>
+                                        <input class="pk-input" type="email" name="email" placeholder="rahul@email.com" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="pk-form-label">City</label>
+                                        <input class="pk-input" type="text" name="city" placeholder="New Delhi">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="pk-form-label">Message *</label>
+                                        <textarea class="pk-input" name="message" rows="3" minlength="10" placeholder="Tell us what kind of policy you need" required></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button class="pk-submit" type="submit">Submit <i class="fas fa-arrow-right"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="pk-copy mt-3" style="font-size:13px">
+                                    <i class="fas fa-lock"></i> Your data is safe and encrypted. No spam, ever.
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                <?php if($trustItems->isNotEmpty()): ?>
+                    <div class="pk-trust-strip">
+                        <?php $__currentLoopData = $trustItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <span class="pk-trust-item"><i class="<?php echo e($item['icon_class'] ?: 'fas fa-check'); ?>"></i><?php echo e($item['text']); ?></span>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>
+
+    <?php if($insurance->detail_feature_intro || $featureItems->isNotEmpty()): ?>
+        <section class="pk-section pk-feature-section">
+            <div class="container">
+                <div class="pk-feature-shell">
+                    <div class="pk-feature-header">
+                        <span class="pk-eyebrow"><i class="fas fa-star"></i> Core Features</span>
+                        <?php if($insurance->detail_feature_intro): ?>
+                            <div class="pk-copy"><?php echo $insurance->detail_feature_intro; ?></div>
+                        <?php else: ?>
+                            <h2>Features of <em><?php echo e($policyName); ?></em></h2>
+                        <?php endif; ?>
+                    </div>
+                    <?php if($featureItems->isNotEmpty()): ?>
+                        <div class="pk-feature-grid">
+                            <?php $__currentLoopData = $featureItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="pk-feature-card">
+                                    <div class="pk-feature-icon"><i class="<?php echo e($item['icon_class'] ?: 'fas fa-star'); ?>"></i></div>
+                                    <h3><?php echo e($item['title']); ?></h3>
+                                    <?php if(!empty($item['description'])): ?>
+                                        <p><?php echo e($item['description']); ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
     <?php endif; ?>
 
-
-
-
-
-    
-
-    <section class="key-feature-section">
-        <div class="container">
-            
-            
-
-            <div class="text-center mb-5 sr">
-                <?php echo $data->longDescription; ?>
-
-            </div>
-
-
-
-            <div class="features-bg">
-                <div class="features-track">
-
-                    <div class="feat-node active" onclick="setActive(this)">
-                        <div class="feat-circle"><span class="feat-emoji">🏥</span></div>
-                        <div class="feat-label">Best Value Plan</div>
-                    </div>
-
-                    <div class="feat-node" onclick="setActive(this)">
-                        <div class="feat-circle"><span class="feat-emoji">💊</span></div>
-                        <div class="feat-label">Most Comprehensive Plan </div>
-                    </div>
-
-                    <div class="feat-node" onclick="setActive(this)">
-                        <div class="feat-circle"><span class="feat-emoji">🛡️</span></div>
-                        <div class="feat-circle" style="display:none"></div>
-                        <div class="feat-circle" style="display:none"></div>
-                        <!-- fix: only one circle per node -->
-                        <div class="feat-label">Lowest Premium Plan </div>
-                    </div>
-
-                    <div class="feat-node" onclick="setActive(this)">
-                        <div class="feat-circle"><span class="feat-emoji">📈</span></div>
-                        <div class="feat-label">Lowest Premium Plan </div>
-                    </div>
-
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    
-
-
-    <!-- ═══════════════════════════════════════  SECTION 3 – POLICY DESCRIPTION  ═══════════════════════════════════════ -->
-    <section class="policy-overview-section">
-        <div class="container">
-
-            <div class="text-center mb-5 sr">
-                <div class="section-eyebrow"><i class="fas fa-star"></i> Policy Overview</div>
-
-                <h2 class="sec-h mb-3">What is <em><?php echo e($insurance->name); ?>?</em></h2>
-                <p>Health insurance is a structured financial safeguard that covers medical expenses arising from
-                    hospitalization, illnesses, and emergencies—helping you avoid high out-of-pocket costs during
-                    critical situations.</p>
-                <p>By paying a fixed premium, you get access to some of the best health insurance plans in India,
-                    including benefits like cashless treatment at network hospitals, pre- and post-hospitalization
-                    coverage, and reimbursement for eligible medical expenses.</p>
-                <p>A well-chosen health insurance policy for individuals and families ensures timely access to quality
-                    healthcare without financial strain, whether planned or unexpected.</p>
-                <p>With rising healthcare costs, choosing the right health insurance plan with maximum coverage and
-                    benefits is essential to protect both your health and long-term financial stability.</p>
-
-            </div>
-        </div>
-    </section>
-
-
-    
-    <section class="categories insurance-type-section" id="categories">
-        <div class="container">
-            <div class="text-center mb-5 sr in">
-                <div class="section-eyebrow"><i class="fas fa-star"></i> Policy Types</div>
-                <h2 class="section-h mb-3">Types of <em><?php echo e($insurance->name); ?></em> Plans</h2>
-                <p class="section-p mx-auto">Choose the right type of plan based on your needs, family size, and
-                    coverage goals.</p>
-            </div>
-
-            <div class="cat-grid">
-                <div class="cat-card sr sr-d1 in">
-                    
-                    <div class="cat-name">Individual Health Insurance</div>
-                    <div class="cat-desc">Covers a single person with a dedicated sum insured.</div>
-                    <div class="cat-desc"><b>Best for:</b> Individuals who want personal coverage without sharing
-                        benefits.</div>
+    <?php if($showRecommendedPlans): ?>
+        <section class="pk-section pk-recommended-section">
+            <div class="container">
+                <div class="pk-recommended-header">
+                    <?php if($recommendedPlanLabel): ?>
+                        <span class="pk-eyebrow"><i class="fas fa-star"></i> <?php echo e($recommendedPlanLabel); ?></span>
+                    <?php endif; ?>
+                    <?php if($recommendedPlanTitle): ?>
+                        <h2 class="pk-title"><?php echo $recommendedPlanTitle; ?></h2>
+                    <?php endif; ?>
+                    <?php if($recommendedPlanDescription): ?>
+                        <div class="pk-copy"><?php echo $recommendedPlanDescription; ?></div>
+                    <?php endif; ?>
                 </div>
 
-                <div class="cat-card sr sr-d1 in">
-                    <div class="cat-name">Family Floater Plans</div>
-                    <div class="cat-desc">One sum insured is shared across all family members.</div>
-                    <div class="cat-desc"><b>Best for:</b>Families looking for cost-effective health insurance coverage.
+                <?php if($recommendedPlanItems->isNotEmpty()): ?>
+                    <div class="pk-plan-rail">
+                        <div class="pk-plan-grid">
+                            <?php $__currentLoopData = $recommendedPlanItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
+                                    $isHighlighted = !empty($item['highlight']) || (!$hasHighlightedRecommendedPlan && $index === 0);
+                                ?>
+                                <div class="pk-plan-node <?php echo e($isHighlighted ? 'is-highlight' : ''); ?>">
+                                    <div class="pk-plan-circle">
+                                        <i class="<?php echo e($item['icon_class'] ?: 'fas fa-file-alt'); ?>"></i>
+                                    </div>
+                                    <h3><?php echo e($item['title']); ?></h3>
+                                </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
 
-                <div class="cat-card sr sr-d1 in">
-                    <div class="cat-name">Senior Citizen Health Insurance</div>
-                    <div class="cat-desc">Designed for individuals aged 60 and above with age-specific benefits</div>
-                    <div class="cat-desc"><b>Best for:</b>Parents and elderly members needing higher medical support.
-                    </div>
+    <?php if($insurance->detail_overview_content): ?>
+        <section class="pk-section pk-section-soft">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <span class="pk-eyebrow"><i class="fas fa-star"></i> Policy Overview</span>
+                    <h2 class="pk-title">What is <em><?php echo e($policyName); ?>?</em></h2>
                 </div>
+                <div class="pk-copy mx-auto" style="max-width: 900px"><?php echo $insurance->detail_overview_content; ?></div>
+            </div>
+        </section>
+    <?php endif; ?>
 
-                <div class="cat-card sr sr-d1 in">
-                    <div class="cat-name">Group Health Insurance</div>
-                    <div class="cat-desc">Provided by employers for employees.</div>
-                    <div class="cat-desc"><b>Best for:</b>Corporate coverage (may not be sufficient alone).</div>
+    <?php if($policyTypes->isNotEmpty()): ?>
+        <section class="pk-section">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <span class="pk-eyebrow"><i class="fas fa-layer-group"></i> Policy Types</span>
+                    <h2 class="pk-title">Types of <em><?php echo e($policyName); ?></em> Plans</h2>
+                    <?php if($insurance->detail_policy_types_intro): ?>
+                        <div class="pk-copy mx-auto" style="max-width: 760px"><?php echo $insurance->detail_policy_types_intro; ?></div>
+                    <?php endif; ?>
+                </div>
+                <div class="pk-card-grid">
+                    <?php $__currentLoopData = $policyTypes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="pk-card">
+                            <h3><?php echo e($item['title']); ?></h3>
+                            <?php if(!empty($item['description'])): ?>
+                                <p><?php echo e($item['description']); ?></p>
+                            <?php endif; ?>
+                            <?php if(!empty($item['best_for'])): ?>
+                                <span class="pk-badge"><i class="fas fa-check"></i> Best for: <?php echo e($item['best_for']); ?></span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
-            <p class="section-p text-center mt-3">Not sure which plan suits you? Get expert guidance instantly on
-                WhatsApp and find the right plan in minutes.</p>
-        </div>
-    </section>
-    
+        </section>
+    <?php endif; ?>
 
+    <?php if($insurance->detail_insurer_intro || $ourPartners->count() > 0): ?>
+        <section class="pk-section pk-section-soft">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <span class="pk-eyebrow"><i class="fas fa-building-shield"></i> Top Insurers</span>
+                    <h2 class="pk-title">Compare <em><?php echo e($policyName); ?></em> Plans from Top Insurers</h2>
+                    <?php if($insurance->detail_insurer_intro): ?>
+                        <div class="pk-copy mx-auto" style="max-width: 780px"><?php echo $insurance->detail_insurer_intro; ?></div>
+                    <?php endif; ?>
+                </div>
 
-
-    
-    <section class="policy-overview-section">
-        <div class="container">
-
-            <div class="text-center mb-5 sr in">
-                <div class="section-eyebrow"><i class="fas fa-star"></i> Top Insurers</div>
-
-                <h2 class="sec-h mb-3">Compare <em><?php echo e($insurance->name); ?></em>Plans from Top Insurers</h2>
-                <p class="section-p mx-auto text-center ">Get real-time quotes on WhatsApp and compare health insurance
-                    plans online in India based on:</p>
-
-                <div class="partners-section sr in">
-                    <div class="slider--">
-                        <div class="slide-track">
-                            <div class="client">
-                                <img src="http://localhost/laravel-projects/policykholo/uploads/our-clients/69de37a44f482.jpg"
-                                    alt="Care Health">
+                <?php if($ourPartners->count() > 0): ?>
+                    <div class="partners-section sr">
+                        <div class="partners-lbl">Our Insurance Partners</div>
+                        <div class="slider--">
+                            <div class="slide-track">
+                                <?php $__currentLoopData = $ourPartners; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $partner): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="client">
+                                        <img src="<?php echo e(asset($partner->image ?? '')); ?>" alt="<?php echo e($partner->title); ?>">
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
-                            <div class="client">
-                                <img src="http://localhost/laravel-projects/policykholo/uploads/our-clients/69de379458cff.jpg"
-                                    alt="sdds">
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php if($howSteps->isNotEmpty()): ?>
+        <section class="pk-section">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <span class="pk-eyebrow"><i class="fas fa-route"></i> How It Works</span>
+                    <h2 class="pk-title"><?php echo e($insurance->detail_how_it_works_title ?: 'Getting insured is simple'); ?></h2>
+                    <?php if($insurance->detail_how_it_works_description): ?>
+                        <div class="pk-copy mx-auto" style="max-width: 760px"><?php echo $insurance->detail_how_it_works_description; ?></div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="pk-steps">
+                    <div>
+                        <?php $__currentLoopData = $howSteps; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="pk-step <?php echo e($index === 0 ? 'active' : ''); ?>" data-step="<?php echo e($index); ?>" data-num="<?php echo e($index + 1); ?>">
+                                <h3><?php echo e($item['title']); ?></h3>
+                                <?php if(!empty($item['description'])): ?>
+                                    <p><?php echo e($item['description']); ?></p>
+                                <?php endif; ?>
                             </div>
-                            <div class="client">
-                                <img src="http://localhost/laravel-projects/policykholo/uploads/our-clients/69de361f222da.jpg"
-                                    alt="ICIC">
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+
+                    <div class="pk-step-card" id="policyStepCard">
+                        <div class="pk-step-card-head">
+                            <i id="policyStepIcon" class="<?php echo e($howSteps->first()['icon_class'] ?: 'fas fa-shield-alt'); ?>"></i>
+                            <div>
+                                <span class="pk-step-label">Selected Step</span>
+                                <h3 id="policyStepTitle"><?php echo e($howSteps->first()['title']); ?></h3>
                             </div>
-                            <div class="client">
-                                <img src="http://localhost/laravel-projects/policykholo/uploads/our-clients/69de3638ea678.jpg"
-                                    alt="Royal Sundaram">
-                            </div>
-                            <div class="client">
-                                <img src="http://localhost/laravel-projects/policykholo/uploads/our-clients/69de364871cd9.jpg"
-                                    alt="HDFC">
-                            </div>
-                            <div class="client">
-                                <img src="http://localhost/laravel-projects/policykholo/uploads/our-clients/69de3659d6a94.jpg"
-                                    alt="Future General">
+                        </div>
+                        <div class="pk-step-card-body">
+                            <p class="pk-copy" id="policyStepDescription"><?php echo e($howSteps->first()['description'] ?? ''); ?></p>
+                            <div class="pk-check-list" id="policyStepChecks">
+                                <?php $__currentLoopData = ($howSteps->first()['checks'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $check): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="pk-check"><span><i class="fas fa-check"></i></span><?php echo e($check); ?></div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-        </div>
-    </section>
-    <!--  Top Insurers end  -->
+        </section>
+    <?php endif; ?>
 
-    <!-- how it works start  -->
-
-    <section class="how-it-works-section">
-        <div class="container">
-            <!-- Header -->
-            <div class="text-center">
-                <div class="section-eyebrow"><i class="fas fa-star"></i> How It Works</div>
-                <h2 class="sec-h mb-3">Getting insured is simple and takes just a <em>few minutes</em></h2>
-                <p class="section-p mx-auto text-center ">Get real-time quotes on WhatsApp and compare health insurance
-                    plans online in India based on</p>
-            </div>
-
-            <div class="hiw-layout">
-                <!-- LEFT: Steps -->
-                <div>
-                    <div class="steps-list" id="stepsList">
-
-                        <div class="step-item active" data-num="1" data-step="0" onclick="activateStep(this)">
-                            <div class="step-title-row">
-                                <h3 class="step-title">Choose Your Health Cover</h3>
-                                <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
-                            </div>
-                            <div class="step-desc">
-                                Select from Individual, Family Floater, or Senior Citizen plans.
-                                Customise your sum insured — from ₹3 Lakh to ₹1 Crore — based on your family's needs and
-                                budget.
-                            </div>
-                            <div class="step-progress">
-                                <div class="step-progress-fill"></div>
-                            </div>
-                        </div>
-
-                        <div class="step-item" data-num="2" data-step="1" onclick="activateStep(this)">
-                            <div class="step-title-row">
-                                <h3 class="step-title">Add Your Members & Details</h3>
-                                <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
-                            </div>
-                            <div class="step-desc">
-                                Enter basic details for each family member — name, age, and any pre-existing conditions.
-                                No lengthy paperwork. Just a quick form that takes under 2 minutes to fill.
-                            </div>
-                            <div class="step-progress">
-                                <div class="step-progress-fill"></div>
-                            </div>
-                        </div>
-
-                        <div class="step-item" data-num="3" data-step="2" onclick="activateStep(this)">
-                            <div class="step-title-row">
-                                <h3 class="step-title">Compare & Select Your Plan</h3>
-                                <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
-                            </div>
-                            <div class="step-desc">
-                                We instantly show you the best matching plans with transparent pricing.
-                                Compare coverage, add-ons, hospital networks, and claim settlement ratios side-by-side.
-                            </div>
-                            <div class="step-progress">
-                                <div class="step-progress-fill"></div>
-                            </div>
-                        </div>
-
-                        <div class="step-item" data-num="4" data-step="3" onclick="activateStep(this)">
-                            <div class="step-title-row">
-                                <h3 class="step-title">Pay & Get Instant Policy</h3>
-                                <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
-                            </div>
-                            <div class="step-desc">
-                                Pay securely online via UPI, Net Banking, or Card. Your policy document is emailed
-                                instantly. Coverage begins within 24 hours — no waiting, no surprises.
-                            </div>
-                            <div class="step-progress">
-                                <div class="step-progress-fill"></div>
-                            </div>
-                        </div>
-
-                    </div><!-- /steps-list -->
-
-
-                </div>
-                <!-- /LEFT -->
-
-                <!-- RIGHT: Visual -->
-                <div class="hiw-visual">
-                    <div class="visual-bg-circle"></div>
-                    <!-- Central info card -->
-                    <div class="visual-center-card" id="visualCard">
-                        <div class="card-step-badge">
-                            <div class="badge-dot"></div>
-                            <span id="cardStepLabel">Step 1 of 4</span>
-                        </div>
-                        <div class="card-emoji-wrap" id="cardEmoji">🏥</div>
-                        <div class="card-title" id="cardTitle">Choose Your Health Cover</div>
-                        <div class="card-desc" id="cardDesc">
-                            Pick from Individual, Family Floater, or Senior Citizen plans with sum insured from ₹3L to
-                            ₹1Cr.
-                        </div>
-                        <div class="card-checks" id="cardChecks">
-                            <div class="card-check-item"><span class="chk"><i class="fas fa-check"></i></span>
-                                Individual
-                                Plans</div>
-                            <div class="card-check-item"><span class="chk"><i class="fas fa-check"></i></span> Family
-                                Floater Plans</div>
-                            <div class="card-check-item"><span class="chk"><i class="fas fa-check"></i></span> Senior
-                                Citizen Plans</div>
-                        </div>
-                    </div>
-
-                    <!-- Dot nav -->
-                    <div class="steps-nav" id="stepsNav">
-                        <div class="nav-dot active" onclick="goToStep(0)"></div>
-                        <div class="nav-dot" onclick="goToStep(1)"></div>
-                        <div class="nav-dot" onclick="goToStep(2)"></div>
-                        <div class="nav-dot" onclick="goToStep(3)"></div>
-                    </div>
-                </div>
-                <!-- /RIGHT -->
-
-            </div>
-        </div>
-    </section>
-    <!-- how it works end -->
-
-
-    <!-- Key benefits start  -->
-    <section class="key-benefit-section">
-        <div class="container">
-            <!-- Header -->
-            <div class="text-center">
-                <div class="section-eyebrow"><i class="fas fa-star"></i> Key benefits</div>
-                <h2 class="sec-h mb-3">Key Benefits of <em><?php echo e($insurance->name); ?></em></h2>
-                <p class="section-p mx-auto text-center ">A good health insurance plan does far more than pay hospital
-                    bills. Here's everything you're protected against — from day one.</p>
-            </div>
-
-            <!-- Benefits Grid -->
-            <div class="benefits-grid">
-                <!-- 2: Daycare Procedures -->
-                <div class="benefit-card" data-emoji="💉" style="--card-color:#00b8a9; --icon-bg:#e6faf8;">
-                    <div class="b-icon">💉</div>
-                    <div class="b-title">500+ Daycare Procedures</div>
-                    <div class="b-desc">
-                        Modern treatments like cataract, dialysis, and chemotherapy that need less than 24 hrs are fully
-                        covered.
-                    </div>
-                    <span class="b-chip" style="--chip-bg:#e6faf8; --chip-txt:#007a6e;">
-                        <i class="fas fa-check" style="font-size:10px;"></i> No 24-hr Admission Needed
-                    </span>
+    <?php if($benefits->isNotEmpty()): ?>
+        <section class="pk-section pk-section-soft">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <span class="pk-eyebrow"><i class="fas fa-gift"></i> Key Benefits</span>
+                    <h2 class="pk-title"><?php echo e($insurance->detail_benefits_title ?: "Key Benefits of {$policyName}"); ?></h2>
+                    <?php if($insurance->detail_benefits_description): ?>
+                        <div class="pk-copy mx-auto" style="max-width: 760px"><?php echo $insurance->detail_benefits_description; ?></div>
+                    <?php endif; ?>
                 </div>
 
-                <!-- 3: Pre & Post Hospitalisation -->
-                <div class="benefit-card" data-emoji="📋" style="--card-color:#7c3aed; --icon-bg:#f3eeff;">
-                    <div class="b-icon">📋</div>
-                    <div class="b-title">Pre & Post Hospitalisation</div>
-                    <div class="b-desc">
-                        Expenses 30 days before and 60 days after discharge — doctor visits, tests, medicines — all
-                        covered.
-                    </div>
-                    <span class="b-chip" style="--chip-bg:#f3eeff; --chip-txt:#7c3aed;">
-                        <i class="fas fa-calendar-check" style="font-size:10px;"></i> 30 + 60 Day Cover
-                    </span>
+                <div class="pk-card-grid">
+                    <?php $__currentLoopData = $benefits; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="pk-card">
+                            <div class="pk-card-icon"><i class="<?php echo e($item['icon_class'] ?: 'fas fa-check'); ?>"></i></div>
+                            <h3><?php echo e($item['title']); ?></h3>
+                            <?php if(!empty($item['description'])): ?>
+                                <p><?php echo e($item['description']); ?></p>
+                            <?php endif; ?>
+                            <?php if(!empty($item['badge'])): ?>
+                                <span class="pk-badge"><i class="fas fa-check"></i><?php echo e($item['badge']); ?></span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
-
-
-
-                <!-- 5: Free Health Checkup -->
-                <div class="benefit-card" data-emoji="🩺" style="--card-color:#f59c1a; --icon-bg:#fff7e6;">
-                    <div class="b-icon">🩺</div>
-                    <div class="b-title">Free Annual Health Check-up</div>
-                    <div class="b-desc">
-                        Preventive care matters. Get a free comprehensive health check every year — at no extra cost to
-                        you.
-                    </div>
-                    <span class="b-chip" style="--chip-bg:#fff7e6; --chip-txt:#c47a00;">
-                        <i class="fas fa-gift" style="font-size:10px;"></i> Complimentary Every Year
-                    </span>
-                </div>
-
-
-
-                <!-- 7: Tax Savings -->
-                <div class="benefit-card" data-emoji="💰" style="--card-color:#e84545; --icon-bg:#fef0f0;">
-                    <div class="b-icon">💰</div>
-                    <div class="b-title">Tax Savings Under Sec 80D</div>
-                    <div class="b-desc">
-                        Save up to ₹75,000 in taxes annually on your health insurance premiums. Smart coverage that also
-                        saves money.
-                    </div>
-                    <span class="b-chip" style="--chip-bg:#fef0f0; --chip-txt:#c0392b;">
-                        <i class="fas fa-indian-rupee-sign" style="font-size:10px;"></i> Up to ₹75,000 Saved
-                    </span>
-                </div>
-
             </div>
+        </section>
+    <?php endif; ?>
 
-        </div>
-    </section>
-    <!-- Key benefits end -->
+    <?php if($buyingGuideItems->isNotEmpty()): ?>
+        <section class="pk-section pk-guide-section">
+            <div class="container">
+                <div class="pk-guide-header">
+                    <span class="pk-eyebrow"><i class="fas fa-compass"></i> Buyer's Guide</span>
+                    <h2 class="pk-title"><?php echo $buyingGuideTitleHtml; ?></h2>
+                    <?php if($insurance->detail_buying_guide_description): ?>
+                        <div class="pk-copy"><?php echo $insurance->detail_buying_guide_description; ?></div>
+                    <?php endif; ?>
+                </div>
 
-    <!-- ═══════════════════════════════════════  SECTION 3 – POLICY DESCRIPTION  ═══════════════════════════════════════ -->
-    <section class="policy-desc-section">
-        <div class="container">
-
-            <div class="text-center mb-5 sr">
-                <div class="eyebrow"><span class="dot"></span> Policy Overview</div>
-                <h2 class="sec-h mb-3">Understanding <em><?php echo e($insurance->name); ?></em></h2>
-                <?php echo $insurance->shortDescription; ?>
-
+                <div class="pk-guide-grid">
+                    <?php $__currentLoopData = $buyingGuideItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="pk-guide-card">
+                            <div class="pk-guide-number"><?php echo e($index + 1); ?></div>
+                            <div class="pk-guide-content">
+                                <h3><?php echo e($item['title']); ?></h3>
+                                <?php if(!empty($item['description'])): ?>
+                                    <p><?php echo e($item['description']); ?></p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="pk-guide-check"><i class="fas fa-check"></i></div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    <?php endif; ?>
 
+    <?php if($claimGroups->isNotEmpty()): ?>
+        <section class="pk-section pk-section-soft">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <span class="pk-eyebrow"><i class="fas fa-file-medical"></i> Claims Guide</span>
+                    <h2 class="pk-title"><?php echo e($insurance->detail_claims_title ?: "{$policyName} Claims Process"); ?></h2>
+                    <?php if($insurance->detail_claims_description): ?>
+                        <div class="pk-copy mx-auto" style="max-width: 760px"><?php echo $insurance->detail_claims_description; ?></div>
+                    <?php endif; ?>
+                </div>
 
-    <!-- Scripts -->
+                <ul class="nav nav-pills pk-claim-tabs" role="tablist">
+                    <?php $__currentLoopData = $claimGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type => $steps): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $tabId = 'claim-'.\Illuminate\Support\Str::slug($type); ?>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link pk-claim-tab <?php echo e($loop->first ? 'active' : ''); ?>" data-bs-toggle="pill" data-bs-target="#<?php echo e($tabId); ?>" type="button">
+                                <?php echo e($type); ?>
+
+                            </button>
+                        </li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </ul>
+
+                <div class="tab-content">
+                    <?php $__currentLoopData = $claimGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type => $steps): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php $tabId = 'claim-'.\Illuminate\Support\Str::slug($type); ?>
+                        <div class="tab-pane fade <?php echo e($loop->first ? 'show active' : ''); ?>" id="<?php echo e($tabId); ?>">
+                            <div class="pk-card-grid">
+                                <?php $__currentLoopData = $steps; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="pk-card text-center">
+                                        <div class="pk-card-icon"><i class="<?php echo e($item['icon_class'] ?: 'fas fa-file-contract'); ?>"></i></div>
+                                        <h3><?php echo e($item['title']); ?></h3>
+                                        <?php if(!empty($item['description'])): ?>
+                                            <p><?php echo e($item['description']); ?></p>
+                                        <?php endif; ?>
+                                        <span class="pk-badge">Step <?php echo e($index + 1); ?></span>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php if($testimonials->isNotEmpty() || $trustStats->isNotEmpty()): ?>
+        <section class="pk-section">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <span class="pk-eyebrow"><i class="fas fa-comment-dots"></i> Customer Stories</span>
+                    <h2 class="pk-title"><?php echo e($insurance->detail_testimonial_title ?: 'Trusted by Happy Families'); ?></h2>
+                    <?php if($insurance->detail_testimonial_description): ?>
+                        <div class="pk-copy mx-auto" style="max-width: 760px"><?php echo $insurance->detail_testimonial_description; ?></div>
+                    <?php endif; ?>
+                </div>
+
+                <?php if($testimonials->isNotEmpty()): ?>
+                    <div class="pk-testimonial-track">
+                        <?php $__currentLoopData = $testimonials; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
+                                $rating = max(1, min(5, (int)($item['rating'] ?? 5)));
+                                $initial = strtoupper(substr(trim($item['name'] ?? 'C'), 0, 1));
+                            ?>
+                            <div class="pk-card">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="pk-avatar"><?php echo e($initial); ?></span>
+                                        <div>
+                                            <h5 class="mb-0"><?php echo e($item['name'] ?? 'Customer'); ?></h5>
+                                            <?php if(!empty($item['handle'])): ?>
+                                                <small class="text-muted"><?php echo e($item['handle']); ?></small>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pk-stars">
+                                    <?php for($i = 0; $i < $rating; $i++): ?>
+                                        <i class="fas fa-star"></i>
+                                    <?php endfor; ?>
+                                </div>
+                                <p><?php echo e($item['message']); ?></p>
+                                <?php if(!empty($item['date'])): ?>
+                                    <small class="text-muted d-block mt-3"><?php echo e($item['date']); ?></small>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if($trustStats->isNotEmpty()): ?>
+                    <div class="pk-trust-stats">
+                        <?php $__currentLoopData = $trustStats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="pk-trust-stat">
+                                <strong><?php echo e($item['value']); ?></strong>
+                                <span class="pk-copy"><?php echo e($item['label']); ?></span>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php if($faqItems->isNotEmpty()): ?>
+        <section class="pk-section pk-section-soft">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="pk-title">Frequently Asked <em>Questions</em></h2>
+                </div>
+                <div class="mx-auto" style="max-width: 920px">
+                    <?php $__currentLoopData = $faqItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="pk-faq-item <?php echo e($loop->first ? 'open' : ''); ?>">
+                            <div class="pk-faq-q">
+                                <span><?php echo e($item['question']); ?></span>
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="pk-faq-a"><?php echo $item['answer'] ?? ''; ?></div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php if($finalContent): ?>
+        <section class="pk-section">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <span class="pk-eyebrow"><i class="fas fa-shield-alt"></i> Policy Overview</span>
+                    <h2 class="pk-title">Compare the Best <em><?php echo e($policyName); ?></em> Plans Today</h2>
+                </div>
+                <div class="pk-copy mx-auto" style="max-width: 920px"><?php echo $finalContent; ?></div>
+            </div>
+        </section>
+    <?php endif; ?>
+</main>
+
+<?php if($howSteps->isNotEmpty()): ?>
     <script>
-    /* Car plate input formatting */
-    let plateInput = document.querySelector('.car-input');
-    if (plateInput) {
-        plateInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase().replace(/[^A-Z0-9\s]/g, '');
+        window.policyStepData = <?php echo json_encode($howSteps, 15, 512) ?>;
+
+        function renderPolicyStep(index) {
+            const item = window.policyStepData[index] || window.policyStepData[0];
+            if (!item) return;
+
+            document.querySelectorAll('.pk-step').forEach(function (step) {
+                step.classList.toggle('active', parseInt(step.dataset.step, 10) === index);
+            });
+
+            document.getElementById('policyStepIcon').className = item.icon_class || 'fas fa-shield-alt';
+            document.getElementById('policyStepTitle').textContent = item.title || '';
+            document.getElementById('policyStepDescription').textContent = item.description || '';
+
+            const checks = Array.isArray(item.checks) ? item.checks : [];
+            document.getElementById('policyStepChecks').innerHTML = checks.map(function (check) {
+                return '<div class="pk-check"><span><i class="fas fa-check"></i></span>' + check + '</div>';
+            }).join('');
+        }
+
+        document.querySelectorAll('.pk-step').forEach(function (step) {
+            step.addEventListener('click', function () {
+                renderPolicyStep(parseInt(step.dataset.step, 10));
+            });
         });
-    }
     </script>
+<?php endif; ?>
 
-
-    <script>
-    // Member card toggle
-    document.querySelectorAll('.member-card').forEach(card => {
-        card.addEventListener('click', () => {
-            card.classList.toggle('active');
+<script>
+    document.querySelectorAll('.pk-faq-q').forEach(function (question) {
+        question.addEventListener('click', function () {
+            const item = question.closest('.pk-faq-item');
+            const panel = item.parentElement;
+            panel.querySelectorAll('.pk-faq-item').forEach(function (row) {
+                if (row !== item) row.classList.remove('open');
+            });
+            item.classList.toggle('open');
         });
     });
+</script>
+<?php $__env->stopSection(); ?>
 
-    // Pincode validation visual
-    const pincodeInput = document.querySelector('input[maxlength="6"]');
-    const errMsg = document.querySelector('.error-msg');
-    pincodeInput.addEventListener('input', () => {
-        if (pincodeInput.value.length === 6 && /^\d+$/.test(pincodeInput.value)) {
-            errMsg.style.display = 'none';
-            pincodeInput.style.borderColor = '#00d4aa';
-        } else {
-            errMsg.style.display = 'flex';
-            pincodeInput.style.borderColor = '';
-        }
-    });
-    </script>
-
-
-
-
-    <script>
-    const stepData = [{
-            emoji: '🏥',
-            label: 'Step 1 of 4',
-            title: 'Choose Your Health Cover',
-            desc: 'Pick from Individual, Family Floater, or Senior Citizen plans with sum insured from ₹3L to ₹1Cr.',
-            //   checks: ['Individual Plans', 'Family Floater Plans', 'Senior Citizen Plans']
-        },
-        {
-            emoji: '📝',
-            label: 'Step 2 of 4',
-            title: 'Add Members & Details',
-            desc: 'Enter basic info for each family member in under 2 minutes. No lengthy paperwork required.',
-            //   checks: ['Name & Age', 'Pre-existing Conditions', 'Pincode & Contact']
-        },
-        {
-            emoji: '🔍',
-            label: 'Step 3 of 4',
-            title: 'Compare & Select Plan',
-            desc: 'Side-by-side comparison of top plans — coverage, premiums, hospital network & claim ratios.',
-            //   checks: ['Coverage Comparison', 'Hospital Network', 'Claim Settlement Ratio']
-        },
-        {
-            emoji: '🎉',
-            label: 'Step 4 of 4',
-            title: 'Pay & Get Instant Policy',
-            desc: 'Pay via UPI, Card or Net Banking. Policy document emailed instantly. Coverage starts in 24hrs.',
-            //   checks: ['UPI / Card / Net Banking', 'Instant Email Delivery', 'Coverage in 24 Hours']
-        }
-    ];
-
-    function updateCard(idx) {
-        const d = stepData[idx];
-        document.getElementById('cardStepLabel').textContent = d.label;
-        document.getElementById('cardEmoji').textContent = d.emoji;
-        document.getElementById('cardTitle').textContent = d.title;
-        document.getElementById('cardDesc').textContent = d.desc;
-
-        const checksEl = document.getElementById('cardChecks');
-        checksEl.innerHTML = d.checks.map(c =>
-            `<div class="card-check-item"><span class="chk"><i class="fas fa-check"></i></span> ${c}</div>`
-        ).join('');
-
-        // nav dots
-        document.querySelectorAll('.nav-dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === idx);
-        });
-
-        // card pop
-        const card = document.getElementById('visualCard');
-        card.style.transform = 'scale(0.97)';
-        setTimeout(() => {
-            card.style.transform = 'scale(1)';
-            card.style.transition = 'transform 0.25s';
-        }, 50);
-    }
-
-    function activateStep(el) {
-        document.querySelectorAll('.step-item').forEach(s => s.classList.remove('active'));
-        el.classList.add('active');
-
-        // restart progress bar animation
-        const bar = el.querySelector('.step-progress-fill');
-        bar.style.animation = 'none';
-        bar.offsetHeight;
-        bar.style.animation = 'fillBar 4s linear forwards';
-
-        const idx = parseInt(el.dataset.step);
-        updateCard(idx);
-    }
-
-    function goToStep(idx) {
-        const steps = document.querySelectorAll('.step-item');
-        activateStep(steps[idx]);
-    }
-
-    // Auto-advance every 4s
-    let current = 0;
-    setInterval(() => {
-        current = (current + 1) % 4;
-        goToStep(current);
-    }, 4500);
-    </script>
-
-
-
-    <?php $__env->stopSection(); ?>
 <?php echo $__env->make('front.layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\installed-softwares\xampp-8.2.12\htdocs\laravel-projects\policykholo\projects\resources\views/front/static/policy-detail.blade.php ENDPATH**/ ?>

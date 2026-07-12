@@ -21,6 +21,7 @@ use App\Models\Blogs\BlogCategory;
 use App\Models\ContactusRequest;
 use App\Models\Testimonial;
 use App\Models\Service;
+use App\Models\ProductEnquiryNow;
 use App\Models\NewsPost;
 use App\Models\Location;
 use App\Models\Attraction;
@@ -405,7 +406,7 @@ class PageController extends Controller
         $data = Cms::where("seo_url", 'policy-detail')->first();
 
         if ($data) {
-            $insurance = Service::where("seo_url", $seo_url)->first();
+            $insurance = Service::with('faqs')->where("seo_url", $seo_url)->first();
             $templete = "front.static.".$data->templete;
             return view($templete, compact("data", "insurance"));
         }
